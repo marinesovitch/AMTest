@@ -1,0 +1,5 @@
+win32build
+x64
+.vs
+.vscode
+*.vcxproj.user

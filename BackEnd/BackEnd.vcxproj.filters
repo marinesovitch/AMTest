@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files %28Implementation%29">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files %28Interface%29">
+      <UniqueIdentifier>{02114423-a2c4-45f9-8a32-83b3fc88db56}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="detail\beDiagnostics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beInternalTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beMapReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beRangeTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\ph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beIntervalTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beContentsGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beBitmap.cpp">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beViewportArea.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beTreeUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beSegmentsManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beConsts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beBigCoordTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beControllerImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beDocumentImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beDocument.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\beMapStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="detail\beDiagnostics.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beInternalTypes.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beMapReader.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beRangeTree.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\ph.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="h\beController.h">
+      <Filter>Header Files %28Interface%29</Filter>
+    </ClInclude>
+    <ClInclude Include="h\beTypes.h">
+      <Filter>Header Files %28Interface%29</Filter>
+    </ClInclude>
+    <ClInclude Include="h\beDocument.h">
+      <Filter>Header Files %28Interface%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beIntervalTree.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="h\beBitmap.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beContentsGenerator.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beViewportArea.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beTreeUtils.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beUtils.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beSegmentsManager.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beConsts.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beBigCoordTypes.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beConfig.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beInternalDocument.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beControllerImpl.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\beDocumentImpl.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="h\beInstance.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+    <ClInclude Include="h\beMapStream.h">
+      <Filter>Header Files %28Implementation%29</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

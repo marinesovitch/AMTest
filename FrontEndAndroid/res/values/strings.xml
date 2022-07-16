@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">AMTest</string>
+	
+	<string name="settings_label">Settings</string>
+	<string name="settings_title">AMtest settings</string>
+	<string name="settings_shortcut">s</string>
+
+	<string name="show_params_title">Show params</string>
+	<string name="show_params_summary">Show current view params</string>
+
+	<string name="enable_extra_gestures_title">Enable extra gestures</string>
+	<string name="enable_extra_gestures_summary">Enable drag / scale gestures</string>
+
+	<string name="reset_view_label">ResetView</string>
+	<string name="reset_view_title">Reset view</string>
+	<string name="reset_view_shortcut">r</string>
+</resources>
