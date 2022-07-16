@@ -2,19 +2,21 @@
 package com.amtest.frontend;
 
 import android.util.Log;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.*;
 import android.graphics.*;
 import android.os.*;
 import android.view.*;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.*;
 
 // ----------------------------------------------------------------------------
 
-public class AMTest extends Activity
+public class AMTest extends AppCompatActivity
 {
 	@Override
 	public void onCreate( Bundle savedInstanceState )
@@ -36,7 +38,7 @@ public class AMTest extends Activity
 	}
 
 	@Override
-	public void onConfigurationChanged( Configuration newConfig )
+	public void onConfigurationChanged(@NonNull Configuration newConfig )
 	{
 		super.onConfigurationChanged( newConfig );
 		d_view.updateSize();
@@ -79,9 +81,9 @@ public class AMTest extends Activity
 
 	// ----------------------------------------------------------------------------
 
-	private int allocBackEndInstance()
+	private long allocBackEndInstance()
 	{
-		int result = 0;
+		long result = 0;
 
 		try
 		{
@@ -118,8 +120,7 @@ public class AMTest extends Activity
 				isEof = true;
 		}
 
-		byte[] result = mapBytesStream.toByteArray();
-		return result;
+		return mapBytesStream.toByteArray();
 	}
 
 	private void showPreferences()
@@ -135,7 +136,7 @@ public class AMTest extends Activity
 
 	// ----------------------------------------------------------------------------
 
-	private native int createBackendInstance( byte[] mapBytesArray, int mapBytesArraySize );
+	private native long createBackendInstance( byte[] mapBytesArray, int mapBytesArraySize );
 	private native void destroyBackendInstance( long beInstanceHandle );
 
 	private long d_beInstanceHandle;
@@ -170,7 +171,7 @@ class KDocument
 		setState( d_beInstanceHandle, stateString );
 	}
 
-	short getBkColor()
+	int getBkColor()
 	{
 		return getBkColor( d_beInstanceHandle );
 	}
@@ -179,9 +180,9 @@ class KDocument
 
 	private native String getState( long beInstanceHandle );
 	private native void setState( long beInstanceHandle, String stateString );
-	private native short getBkColor( long beInstanceHandle );
+	private native int getBkColor( long beInstanceHandle );
 
-	private long d_beInstanceHandle;
+	private final long d_beInstanceHandle;
 
 }
 
@@ -275,7 +276,7 @@ class KController
 
 	// ----------------------------------------------------------------------------
 
-	private int d_beInstanceHandle;
+	private final long d_beInstanceHandle;
 }
 
 // ----------------------------------------------------------------------------
@@ -292,7 +293,7 @@ class KView extends View
 		d_document = document;
 		d_controller = controller;
 
-		java.util.ArrayList< View > touchables = new java.util.ArrayList< View >();
+		java.util.ArrayList< View > touchables = new java.util.ArrayList<>();
 		touchables.add( this );
 		addTouchables( touchables );
 
@@ -421,24 +422,28 @@ class KView extends View
 	private void drawParamsDescription( Canvas canvas )
 	{
 		Paint paint = new Paint();
-		paint.setTextSize( paint.getTextSize() * 1.2f );
-		int DescriptionScreenOffset = 25;
+		float descriptionTextSize = paint.getTextSize() * 1.9f;
+		paint.setTextSize(descriptionTextSize);
+
+		float descriptionScreenOffset = 10;
+		float x = descriptionScreenOffset;
+		float y = descriptionScreenOffset + descriptionTextSize;
 		String description = d_controller.getParamsDescription();
-		canvas.drawText( description, DescriptionScreenOffset, DescriptionScreenOffset, paint );
+		canvas.drawText( description, x, y, paint );
 	}
 
 	// ----------------------------------------------------------------------------
 
-	private KDocument d_document;
-	private KController d_controller;
+	private final KDocument d_document;
+	private final KController d_controller;
 	private Bitmap d_bitmap;
 
-	private KSimpleGestureListener d_simpleGestureListener;
-	private KTwoFingersTapGestureDetector d_twoFingersTapGestureDetector;
-	private GestureDetector d_gestureDetector;
+	private final KSimpleGestureListener d_simpleGestureListener;
+	private final KTwoFingersTapGestureDetector d_twoFingersTapGestureDetector;
+	private final GestureDetector d_gestureDetector;
 
-	private KScaleGestureListener d_scaleGestureListener;
-	private ScaleGestureDetector d_scaleGestureDetector;
+	private final KScaleGestureListener d_scaleGestureListener;
+	private final ScaleGestureDetector d_scaleGestureDetector;
 
 
 	static final int ViewId = 1;
@@ -577,15 +582,13 @@ class KTwoFingersTapGestureDetector
 
 	private boolean isMovementDetected( MotionEvent event )
 	{
-		boolean result = isPointerMoved( event, 0 ) || isPointerMoved( event, 1 );
-		return result;
+		return isPointerMoved( event, 0 ) || isPointerMoved( event, 1 );
 	}
 
 	private boolean gestureDetected( MotionEvent event )
 	{
 		resetState();
-		boolean result = d_listener.onTwoFingersTap( event );
-		return result;
+		return d_listener.onTwoFingersTap( event );
 	}
 
 	private void resetState()
@@ -654,9 +657,9 @@ class KTwoFingersTapGestureDetector
 
 	private long d_startTimestamp;
 
-	private PointF[] d_pointers = new PointF[ 2 ];
+	private final PointF[] d_pointers = new PointF[ 2 ];
 
-	private IOnTwoFingersTapListener d_listener;
+	private final IOnTwoFingersTapListener d_listener;
 
 	private static final float MovementTolerance = 20f; // points
 	private static final long GestureDurationTolerance = 250; // milliseconds
@@ -734,9 +737,9 @@ class KSimpleGestureListener extends GestureDetector.SimpleOnGestureListener
 
 	// ----------------------------------------------------------------------------
 
-	private Context d_context;
-	private View d_view;
-	private KController d_controller;
+	private final Context d_context;
+	private final View d_view;
+	private final KController d_controller;
 
 }
 
@@ -767,8 +770,7 @@ class KScaleGestureListener implements ScaleGestureDetector.OnScaleGestureListen
 	@Override
 	public boolean onScale( ScaleGestureDetector detector )
 	{
-		boolean consumed = performZoom( detector );
-		return consumed;
+		return performZoom( detector );
 	}
 
 	@Override
@@ -789,15 +791,15 @@ class KScaleGestureListener implements ScaleGestureDetector.OnScaleGestureListen
 		boolean zoomChanged = ( zoomDelta != 0 );
 		if ( zoomChanged )
 		{
-			boolean refresh = false;
 			d_prevZoomFactorDeviation = currentZoomFactorDeviation;
 			int focusX = (int) detector.getFocusX();
 			int focusY = (int) detector.getFocusY();
+			boolean refresh;
 			if ( zoomDelta < 0 )
 			{
 				refresh = d_controller.zoomOut( -zoomDelta, true, focusX, focusY );
 			}
-			else if ( 0 < zoomDelta )
+			else
 			{
 				refresh = d_controller.zoomIn( zoomDelta, true, focusX, focusY );
 			}
@@ -812,14 +814,13 @@ class KScaleGestureListener implements ScaleGestureDetector.OnScaleGestureListen
 	{
 		int scale = Math.max( d_view.getWidth(), d_view.getHeight() );
 		int prefZoomSpanThreshold = scale / 10;
-		int result = Math.max( MinZoomSpanThreshold, prefZoomSpanThreshold );
-		return result;
+		return Math.max( MinZoomSpanThreshold, prefZoomSpanThreshold );
 	}
 
 	// ----------------------------------------------------------------------------
 
-	private View d_view;
-	private KController d_controller;
+	private final View d_view;
+	private final KController d_controller;
 
 	private int d_zoomSpanThreshold;
 	private int d_startSpan;

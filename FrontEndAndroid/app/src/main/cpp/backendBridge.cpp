@@ -25,20 +25,20 @@ using handle_t = jlong;
 
 be::SInstance* raw2instance( handle_t beInstanceHandle )
 {
-	be::SInstance* beInstance = reinterpret_cast< be::SInstance* >( beInstanceHandle );
+	auto beInstance = reinterpret_cast< be::SInstance* >( beInstanceHandle );
 	return beInstance;
 }
 
 be::IDocument* raw2document( handle_t beInstanceHandle )
 {
-	be::SInstance* beInstance = reinterpret_cast< be::SInstance* >( beInstanceHandle );
+	auto beInstance = reinterpret_cast< be::SInstance* >( beInstanceHandle );
 	be::IDocument* beDocument = beInstance->d_document;
 	return beDocument;
 }
 
 be::IController* raw2controller( handle_t beInstanceHandle )
 {
-	be::SInstance* beInstance = reinterpret_cast< be::SInstance* >( beInstanceHandle );
+	auto beInstance = reinterpret_cast< be::SInstance* >( beInstanceHandle );
 	be::IController* beController = beInstance->d_controller;
 	return beController;
 }
@@ -46,8 +46,8 @@ be::IController* raw2controller( handle_t beInstanceHandle )
 std::string j2str( JNIEnv* env, jstring jstr )
 {
 	std::string result;
-	const char* str = env->GetStringUTFChars( jstr, 0 );
-	if ( str != 0 )
+	const char* str = env->GetStringUTFChars( jstr, nullptr );
+	if ( str != nullptr )
 	{
 		result = str;
 		env->ReleaseStringUTFChars( jstr, str );
@@ -68,11 +68,11 @@ class KBitmap :public be::IBitmap
 {
 	public:
 		KBitmap( JNIEnv* env, jobject bitmap );
-		virtual ~KBitmap();
+		~KBitmap() override = default;
 
 	public:
-		virtual bool lock( be::color_t** buffer );
-		virtual void unlock();
+		bool lock( be::color_t** buffer ) override;
+		void unlock() override;
 
 	private:
 		JNIEnv* d_env;
@@ -88,10 +88,6 @@ KBitmap::KBitmap( JNIEnv* env, jobject bitmap )
 {
 }
 
-KBitmap::~KBitmap()
-{
-}
-
 bool KBitmap::lock( be::color_t** buffer )
 {
 	AndroidBitmapInfo info;
@@ -99,7 +95,7 @@ bool KBitmap::lock( be::color_t** buffer )
 	{
 		if ( info.format == ANDROID_BITMAP_FORMAT_RGB_565 )
 		{
-			void* raw_pixels = 0;
+			void* raw_pixels = nullptr;
 			if ( AndroidBitmap_lockPixels( d_env, d_bitmap, &raw_pixels ) == 0 )
 			{
 				*buffer = reinterpret_cast< be::color_t* >( raw_pixels );
@@ -107,7 +103,7 @@ bool KBitmap::lock( be::color_t** buffer )
 		}
 	}
 
-	const bool result = (*buffer) != 0;
+	const bool result = (*buffer) != nullptr;
 	return result;
 }
 
@@ -119,22 +115,18 @@ void KBitmap::unlock()
 // ----------------------------------------------------------------------------
 
 be::IMapStream* createMapStream(
-	jbyte* rawMapStream,
+	const jbyte* rawMapStream,
 	jint rawMapStreamLength )
 {
-	be::IMapStream* mapStream = 0;
-
 	//#define STUB_INPUT
 	#ifdef STUB_INPUT
-	mapStream = be::IMapStream::create();
+	return be::IMapStream::create();
 	#else
-	const int* mapStreamBegin = reinterpret_cast< int* >( rawMapStream );
-	const long mapStreamLength = rawMapStreamLength / sizeof( int );
+	const int* mapStreamBegin = reinterpret_cast< const int* >( rawMapStream );
+	const long mapStreamLength = static_cast<long>(rawMapStreamLength / sizeof( int ));
 	const int* mapStreamEnd = mapStreamBegin + mapStreamLength;
-	mapStream = be::IMapStream::create( mapStreamBegin, mapStreamEnd );
+	return be::IMapStream::create( mapStreamBegin, mapStreamEnd );
 	#endif
-
-	return mapStream;
 }
 
 } // anonymous namespace
@@ -142,9 +134,9 @@ be::IMapStream* createMapStream(
 // ----------------------------------------------------------------------------
 // AMTest
 
-extern "C" JNIEXPORT jint JNICALL Java_com_amtest_frontend_AMTest_createBackendInstance(
+extern "C" JNIEXPORT handle_t JNICALL Java_com_amtest_frontend_AMTest_createBackendInstance(
 	JNIEnv* env,
-	jobject obj,
+	jobject /*obj*/,
 	jbyteArray jmapBytesArray,
 	jint jmapBytesArraySize )
 {
@@ -173,8 +165,8 @@ extern "C" JNIEXPORT jint JNICALL Java_com_amtest_frontend_AMTest_createBackendI
 }
 
 extern "C" JNIEXPORT void JNICALL Java_com_amtest_frontend_AMTest_destroyBackendInstance(
-	JNIEnv* env,
-	jobject obj,
+	JNIEnv* /*env*/,
+	jobject /*obj*/,
 	handle_t beInstanceHandle )
 {
 	LOGI("destroyBackendInstance %p", reinterpret_cast<void*>( beInstanceHandle ));
@@ -187,7 +179,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_amtest_frontend_AMTest_destroyBackend
 
 extern "C" JNIEXPORT jstring JNICALL Java_com_amtest_frontend_KDocument_getState(
 	JNIEnv* env,
-	jobject obj,
+	jobject /*obj*/,
 	handle_t beInstanceHandle )
 {
 	LOGI("getState");
@@ -199,7 +191,7 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_amtest_frontend_KDocument_getState
 
 extern "C" JNIEXPORT void JNICALL Java_com_amtest_frontend_KDocument_setState(
 	JNIEnv* env,
-	jobject obj,
+	jobject /*obj*/,
 	handle_t beInstanceHandle,
 	jstring jstateString )
 {
@@ -210,8 +202,8 @@ extern "C" JNIEXPORT void JNICALL Java_com_amtest_frontend_KDocument_setState(
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_com_amtest_frontend_KDocument_getBkColor(
-	JNIEnv* env,
-	jobject obj,
+	JNIEnv* /*env*/,
+	jobject /*obj*/,
 	handle_t beInstanceHandle )
 {
 	LOGI("getBkColor");
@@ -224,8 +216,8 @@ extern "C" JNIEXPORT jint JNICALL Java_com_amtest_frontend_KDocument_getBkColor(
 // KController
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_setDeviceSize(
-	JNIEnv* env,
-	jobject obj,
+	JNIEnv* /*env*/,
+	jobject /*obj*/,
 	handle_t beInstanceHandle,
 	jint width,
 	jint height )
@@ -238,8 +230,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_setDe
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_moveTo(
-	JNIEnv* env,
-	jobject obj,
+	JNIEnv* /*env*/,
+	jobject /*obj*/,
 	handle_t beInstanceHandle,
 	jint focusPosX,
 	jint focusPosY )
@@ -253,22 +245,22 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_moveT
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_moveInDirection(
-	JNIEnv* env,
-	jobject obj,
+	JNIEnv* /*env*/,
+	jobject /*obj*/,
 	handle_t beInstanceHandle,
 	jint jdirection )
 {
 	LOGI("moveInDirection %d", jdirection);
 	be::IController* beController = raw2controller( beInstanceHandle );
-	const be::EDirection direction = static_cast< be::EDirection >( jdirection );
+	const auto direction = static_cast< be::EDirection >( jdirection );
 	const be::SMoveData moveData( direction );
 	const bool result = beController->move( moveData );
 	return result;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_moveDelta(
-	JNIEnv* env,
-	jobject obj,
+	JNIEnv* /*env*/,
+	jobject /*obj*/,
 	handle_t beInstanceHandle,
 	jint deltaX,
 	jint deltaY )
@@ -282,8 +274,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_moveD
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_zoomIn(
-	JNIEnv* env,
-	jobject obj,
+	JNIEnv* /*env*/,
+	jobject /*obj*/,
 	handle_t beInstanceHandle,
 	jint delta,
 	jboolean zoomInPlace,
@@ -299,8 +291,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_zoomI
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_zoomOut(
-	JNIEnv* env,
-	jobject obj,
+	JNIEnv* /*env*/,
+	jobject /*obj*/,
 	handle_t beInstanceHandle,
 	jint delta,
 	jboolean zoomInPlace,
@@ -316,8 +308,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_zoomO
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_resetView(
-	JNIEnv* env,
-	jobject obj,
+	JNIEnv* /*env*/,
+	jobject /*obj*/,
 	handle_t beInstanceHandle )
 {
 	LOGI("resetView");
@@ -328,7 +320,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_reset
 
 extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_generateContents(
 	JNIEnv* env,
-	jobject obj,
+	jobject /*obj*/,
 	handle_t beInstanceHandle,
 	jobject jbitmap )
 {
@@ -341,7 +333,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_amtest_frontend_KController_gener
 
 extern "C" JNIEXPORT jstring JNICALL Java_com_amtest_frontend_KController_getParamsDescription(
 	JNIEnv* env,
-	jobject obj,
+	jobject /*obj*/,
 	handle_t beInstanceHandle )
 {
 	LOGI("getParamsDescription");
