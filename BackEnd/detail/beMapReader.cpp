@@ -15,7 +15,7 @@ namespace
 class KDeserializator
 {
 	public:
-		KDeserializator( IMapStream* mapStream );
+		explicit KDeserializator( IMapStream* mapStream );
 
 	public:
 		int getInt();
@@ -53,7 +53,7 @@ void KDeserializator::getPoint( SPoint* point )
 // ----------------------------------------------------------------------------
 
 /*
-	read binary file 
+	read binary file
 	format (assumption int == 4 bytes):
 
 	int raw_segments_count
@@ -68,7 +68,7 @@ void KDeserializator::getPoint( SPoint* point )
 class KMapReader
 {
 	public:
-		KMapReader( const SReaderData& data );
+		explicit KMapReader( const SReaderData& data );
 
 	public:
 		bool run();
@@ -77,11 +77,11 @@ class KMapReader
 		void readSegment();
 		bool readPoints( points_t* points );
 
-		void updateRoadClasses( const int roadClass );
+		void updateRoadClasses( int roadClass );
 
 		void updateAreaDims( const points_t& points );
 		void updateAreaDimsByPoint( const SPoint& point );
-		void updateAreaDimByPos( const int pos, int* dimMin, int* dimMax );
+		void updateAreaDimByPos( int pos, int* dimMin, int* dimMax );
 
 	private:
 		KDeserializator d_input;
@@ -98,11 +98,11 @@ KMapReader::KMapReader( const SReaderData& data )
 	, d_mapRect( *data.d_mapRect )
 	, d_roadClasses( *data.d_roadClasses )
 	, d_segments( *data.d_segments )
-{	
-	d_mapRect = SRect( 
+{
+	d_mapRect = SRect(
 		std::numeric_limits< coord_t >::max()
 		, std::numeric_limits< coord_t >::max()
-		, std::numeric_limits< coord_t >::min() 
+		, std::numeric_limits< coord_t >::min()
 		, std::numeric_limits< coord_t >::min() );
 }
 
@@ -112,7 +112,7 @@ bool KMapReader::run()
 	assert( segmentsCount <= KSegmentsManager::maxSegmentCount() );
 	d_segments.reserve( segmentsCount );
 	for ( std::size_t i = 0
-		; i < segmentsCount 
+		; i < segmentsCount
 		; ++i )
 	{
 		readSegment();
@@ -135,7 +135,7 @@ void KMapReader::readSegment()
 	points_t& segmentPoints = segment.d_points;
 	if ( readPoints( &segmentPoints ) )
 	{
-		assert( ( 1 < segmentPoints.size() ) 
+		assert( ( 1 < segmentPoints.size() )
 			&& ( segmentPoints.size() <= KSegmentsManager::maxSegmentPointsCount() ) );
 		updateAreaDims( segmentPoints );
 	}
@@ -150,10 +150,10 @@ bool KMapReader::readPoints( points_t* points )
 	{
 		d_input.getPoint( &point );
 		if ( points->empty()
-			|| ( point.x != points->back().x ) 
+			|| ( point.x != points->back().x )
 			|| ( point.y != points->back().y ) )
 		{
-			assert( points->empty() 
+			assert( points->empty()
 				|| utils::checkSectionLength( points->back(), point ) );
 			points->push_back( point );
 		}
@@ -165,7 +165,7 @@ bool KMapReader::readPoints( points_t* points )
 
 // ----------------------------------------------------------------------------
 
-void KMapReader::updateRoadClasses( const int roadClass )
+void KMapReader::updateRoadClasses( int roadClass )
 {
 	const std::size_t newSize = roadClass + 1;
 	if ( d_roadClasses.size() < newSize )
@@ -175,11 +175,8 @@ void KMapReader::updateRoadClasses( const int roadClass )
 
 void KMapReader::updateAreaDims( const points_t& points )
 {
-	for ( points_cit it = points.begin()
-		; it != points.end()
-		; ++it )
+	for ( const SPoint& point : points )
 	{
-		const SPoint& point = *it;
 		updateAreaDimsByPoint( point );
 	}
 }
@@ -193,9 +190,9 @@ void KMapReader::updateAreaDimsByPoint( const SPoint& point )
 	updateAreaDimByPos( y, &d_mapRect.top, &d_mapRect.bottom );
 }
 
-void KMapReader::updateAreaDimByPos( 
-	const coord_t pos, 
-	coord_t* dimMin, 
+void KMapReader::updateAreaDimByPos(
+	coord_t pos,
+	coord_t* dimMin,
 	coord_t* dimMax )
 {
 	if ( pos < ( *dimMin ) )

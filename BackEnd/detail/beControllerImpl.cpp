@@ -20,7 +20,7 @@ const SBigRect MaxViewportRect( consts::MinCoord, consts::MinCoord, consts::MaxC
 
 // ----------------------------------------------------------------------------
 
-big_coord_t zoomCoord( const coord_t coord, const int zoomFactor )
+big_coord_t zoomCoord( coord_t coord, int zoomFactor )
 {
 	big_coord_t result = coord;
 	if ( 0 < zoomFactor )
@@ -30,7 +30,7 @@ big_coord_t zoomCoord( const coord_t coord, const int zoomFactor )
 	return result;
 }
 
-SBigSize zoomSize( const SSize& size, const int zoomFactor )
+SBigSize zoomSize( const SSize& size, int zoomFactor )
 {
 	const big_coord_t width = zoomCoord( size.width, zoomFactor );
 	const big_coord_t height = zoomCoord( size.height, zoomFactor );
@@ -43,33 +43,33 @@ SBigSize zoomSize( const SSize& size, const int zoomFactor )
 class KController : public IController
 {
 	public:
-		KController( IInternalDocument* document );
-		virtual ~KController();
+		explicit KController( IInternalDocument* document );
+		~KController() override = default;
 
 	public:
 		// IController
-		virtual bool setDeviceSize( const SSize& deviceSize );
-		virtual bool move( const SMoveData& moveData );
-		virtual bool zoom( const SZoomData& zoomData );
-		virtual bool resetView();
+		bool setDeviceSize( const SSize& deviceSize ) override;
+		bool move( const SMoveData& moveData ) override;
+		bool zoom( const SZoomData& zoomData ) override;
+		bool resetView() override;
 
-		virtual bool generateContents( IBitmap* bitmap );
+		bool generateContents( IBitmap* bitmap ) override;
 
-		virtual std::string getParamsDescription() const;
+		std::string getParamsDescription() const override;
 
 	private:
-		SSize calcScreenSize( 
+		SSize calcScreenSize(
 			const SSize& deviceSize,
-			const int zoomFactor ) const;
+			int zoomFactor ) const;
 		int calcZoomFactor(
 			const SZoomData& zoomData,
-			const int currentZoomFactor ) const;
+			int currentZoomFactor ) const;
 
 	private:
 		SBigRect calcViewportRect(
 			const SBigPoint& viewportCenter,
 			const SSize& screenSize,
-			const int zoomFactor ) const;
+			int zoomFactor ) const;
 		SRect calcViewportRect(
 			const SViewData& viewData ) const;
 
@@ -78,45 +78,45 @@ class KController : public IController
 			const SSize& screenSize,
 			const SPoint& currentViewportCenter,
 			const SBigSize& delta,
-			const int zoomFactor,
+			int zoomFactor,
 			const SBigRect& clipRect,
 			SPoint* viewportCenter ) const;
 
-		SPoint calcViewportCenter( 
+		SPoint calcViewportCenter(
 			const SMoveData& moveData,
 			const SRect& screenRect ) const;
-		SPoint calcViewportCenterInDirection( 
+		SPoint calcViewportCenterInDirection(
 			const SMoveData& moveData,
 			const SRect& screenRect ) const;
 		SBigSize calcZoomDelta(
 			const SSize& deviceSize,
 			const SSize& screenSize,
-			const int currentZoomFactor,
-			const int newZoomFactor,
+			int currentZoomFactor,
+			int newZoomFactor,
 			const SZoomData& zoomData ) const;
 		SBigSize calcDeltaForAnchoredScreenPoint(
 			const SRect& screenRect,
-			const int currentZoomFactor,
-			const int newZoomFactor,
+			int currentZoomFactor,
+			int newZoomFactor,
 			const SPoint& screenPoint ) const;
 		SBigSize calcDelta(
 			const SSize& deviceSize,
 			const SSize& screenSize,
-			const int zoomFactor,
-			const SPoint& screenPoint ) const;
+			int zoomFactor,
+			const SPoint& newViewportCenter ) const;
 		coord_t calcCoordDelta(
-			const coord_t deviceDimSize,
-			const coord_t screenDimSize,
-			const coord_t clickScreenCoord ) const;
-		void correctPoint( 
-			const SBigRect& viewportRect, 
-			const SBigRect& clipRect, 
+			coord_t deviceDimSize,
+			coord_t screenDimSize,
+			coord_t clickScreenCoord ) const;
+		void correctPoint(
+			const SBigRect& viewportRect,
+			const SBigRect& clipRect,
 			SBigPoint* viewportCenter ) const;
 		void correctCoord(
-			const big_coord_t viewportMinPos,
-			const big_coord_t viewportMaxPos,
-			const big_coord_t clipRectMinPos,
-			const big_coord_t clipRectMaxPos,
+			big_coord_t viewportMinPos,
+			big_coord_t viewportMaxPos,
+			big_coord_t clipRectMinPos,
+			big_coord_t clipRectMaxPos,
 			big_coord_t* viewportCenterCoord ) const;
 
 	private:
@@ -135,10 +135,6 @@ class KController : public IController
 
 KController::KController( IInternalDocument* document )
 	: d_document( document )
-{
-}
-
-KController::~KController()
 {
 }
 
@@ -181,7 +177,7 @@ bool KController::move( const SMoveData& moveData )
 	const SSize& screenSize = viewData.d_screenSize;
 	const int zoomFactor = viewData.d_zoomFactor;
 	const SPoint& newViewportCenter = calcViewportCenter( moveData, screenSize );
-	const SBigSize& delta = calcDelta( 
+	const SBigSize& delta = calcDelta(
 		deviceSize,
 		screenSize,
 		zoomFactor,
@@ -195,7 +191,7 @@ bool KController::move( const SMoveData& moveData )
 		MaxViewportRect,
 		&viewData.d_viewportCenter );
 
-	
+
 	const bool viewChanged = updateViewData( viewData );
 	return viewChanged;
 }
@@ -213,7 +209,7 @@ bool KController::zoom( const SZoomData& zoomData )
 		const SSize& newScreenSize = calcScreenSize( viewData.d_deviceSize, newZoomFactor );
 		SPoint& viewportCenter = viewData.d_viewportCenter;
 
-		const SBigSize& delta = calcZoomDelta( 
+		const SBigSize& delta = calcZoomDelta(
 			deviceSize,
 			newScreenSize,
 			currentZoomFactor,
@@ -223,8 +219,8 @@ bool KController::zoom( const SZoomData& zoomData )
 		const SZoomData::EKind zoomKind = zoomData.d_kind;
 		if ( zoomKind == SZoomData::ZoomIn )
 		{
-			const SBigRect& clipRect 
-				= zoomData.d_zoomInPlace ? calcViewportRect( viewData ) : MaxViewportRect;
+			const SBigRect& clipRect
+				= zoomData.d_zoomInPlace ? SBigRect(calcViewportRect( viewData )) : MaxViewportRect;
 			updateViewport(
 				deviceSize,
 				newScreenSize,
@@ -305,8 +301,8 @@ std::string KController::getParamsDescription() const
 	const SRect& viewportRect = calcViewportRect( viewData );
 
 	std::ostringstream os;
-	os << "l " << viewportRect.left << " t " << viewportRect.top 
-		<< " r " << viewportRect.right << " b " << viewportRect.bottom 
+	os << "l " << viewportRect.left << " t " << viewportRect.top
+		<< " r " << viewportRect.right << " b " << viewportRect.bottom
 		<< " zoom " << viewData.d_zoomFactor;
 
 	const std::string& result = os.str();
@@ -315,9 +311,9 @@ std::string KController::getParamsDescription() const
 
 // ----------------------------------------------------------------------------
 
-SSize KController::calcScreenSize( 
+SSize KController::calcScreenSize(
 	const SSize& deviceSize,
-	const int zoomFactor ) const
+	int zoomFactor ) const
 {
 	SSize newScreenSize;
 	const int CoordBitsCount = sizeof( coord_t ) * 8;
@@ -337,9 +333,9 @@ SSize KController::calcScreenSize(
 	return newScreenSize;
 }
 
-int KController::calcZoomFactor( 
+int KController::calcZoomFactor(
 	const SZoomData& zoomData,
-	const int currentZoomFactor ) const
+	int currentZoomFactor ) const
 {
 	int newZoomFactor = currentZoomFactor;
 
@@ -368,7 +364,7 @@ int KController::calcZoomFactor(
 SBigRect KController::calcViewportRect(
 	const SBigPoint& viewportCenter,
 	const SSize& rawScreenSize,
-	const int zoomFactor ) const
+	int zoomFactor ) const
 {
 	const SBigSize& screenSize = zoomSize( rawScreenSize, zoomFactor );
 	const big_coord_t left = viewportCenter.x - ( screenSize.width >> 1 );
@@ -381,10 +377,10 @@ SBigRect KController::calcViewportRect(
 SRect KController::calcViewportRect(
 	const SViewData& viewData ) const
 {
-	const SPoint& viewportCenter = viewData.d_viewportCenter;
+	const SBigPoint viewportCenter(viewData.d_viewportCenter);
 	const SSize& screenSize = viewData.d_screenSize;
 	const int zoomFactor = viewData.d_zoomFactor;
-	const SBigRect& rawViewportRect = calcViewportRect( viewportCenter, screenSize, zoomFactor );
+	const SBigRect rawViewportRect(calcViewportRect( viewportCenter, screenSize, zoomFactor ));
 	const big_coord_t left = std::max( rawViewportRect.left, static_cast< big_coord_t>( consts::MinCoord ) );
 	const big_coord_t top = std::max( rawViewportRect.top, static_cast< big_coord_t>( consts::MinCoord ) );
 	const big_coord_t right = std::min( rawViewportRect.right, static_cast< big_coord_t>( consts::MaxCoord ) );
@@ -399,7 +395,7 @@ void KController::updateViewport(
 	const SSize& screenSize,
 	const SPoint& currentViewportCenter,
 	const SBigSize& delta,
-	const int zoomFactor,
+	int zoomFactor,
 	const SBigRect& clipRect,
 	SPoint* viewportCenter ) const
 {
@@ -416,7 +412,7 @@ void KController::updateViewport(
 	}
 }
 
-SPoint KController::calcViewportCenter( 
+SPoint KController::calcViewportCenter(
 	const SMoveData& moveData,
 	const SRect& screenRect ) const
 {
@@ -431,7 +427,7 @@ SPoint KController::calcViewportCenter(
 	{
 		result = calcViewportCenterInDirection( moveData, screenRect );
 	}
-	else 
+	else
 	{
 		assert( moveKind == SMoveData::MoveDelta );
 		const SPoint& screenCenter = screenRect.getCenter();
@@ -443,7 +439,7 @@ SPoint KController::calcViewportCenter(
 	return result;
 }
 
-SPoint KController::calcViewportCenterInDirection( 
+SPoint KController::calcViewportCenterInDirection(
 	const SMoveData& moveData,
 	const SRect& screenRect ) const
 {
@@ -484,8 +480,8 @@ SPoint KController::calcViewportCenterInDirection(
 SBigSize KController::calcZoomDelta(
 	const SSize& deviceSize,
 	const SSize& screenSize,
-	const int currentZoomFactor,
-	const int newZoomFactor,
+	int currentZoomFactor,
+	int newZoomFactor,
 	const SZoomData& zoomData ) const
 {
 	SBigSize result;
@@ -494,7 +490,7 @@ SBigSize KController::calcZoomDelta(
 	const SPoint& focusScreenPoint = zoomData.d_focusScreenPoint;
 	if ( zoomData.d_zoomInPlace )
 	{
-		result = calcDeltaForAnchoredScreenPoint( 
+		result = calcDeltaForAnchoredScreenPoint(
 			screenSize,
 			currentZoomFactor,
 			newZoomFactor,
@@ -502,13 +498,13 @@ SBigSize KController::calcZoomDelta(
 	}
 	else if ( zoomKind == SZoomData::ZoomIn )
 	{
-		result = calcDelta( 
+		result = calcDelta(
 			deviceSize,
 			screenSize,
 			currentZoomFactor,
 			focusScreenPoint );
 	}
-	else 
+	else
 	{
 		assert( !zoomInPlace && ( zoomKind == SZoomData::ZoomOut ) );
 	}
@@ -517,8 +513,8 @@ SBigSize KController::calcZoomDelta(
 
 SBigSize KController::calcDeltaForAnchoredScreenPoint(
 	const SRect& screenRect,
-	const int currentZoomFactor,
-	const int newZoomFactor,
+	int currentZoomFactor,
+	int newZoomFactor,
 	const SPoint& screenPoint ) const
 {
 	const SPoint& screenCenter = screenRect.getCenter();
@@ -532,23 +528,23 @@ SBigSize KController::calcDeltaForAnchoredScreenPoint(
 SBigSize KController::calcDelta(
 	const SSize& deviceSize,
 	const SSize& screenSize,
-	const int zoomFactor,
+	int zoomFactor,
 	const SPoint& newViewportCenter ) const
 {
 	const coord_t raw_delta_x = calcCoordDelta( deviceSize.width, screenSize.width, newViewportCenter.x );
 	const coord_t raw_delta_y = calcCoordDelta( deviceSize.height, screenSize.height, newViewportCenter.y );
 
-	const big_coord_t delta_x = zoomCoord( raw_delta_x, zoomFactor ); 
+	const big_coord_t delta_x = zoomCoord( raw_delta_x, zoomFactor );
 	const big_coord_t delta_y = zoomCoord( raw_delta_y, zoomFactor );
 
 	const SBigSize result( delta_x, delta_y );
 	return result;
 }
 
-coord_t KController::calcCoordDelta( 
-	const coord_t deviceDimSize,
-	const coord_t screenDimSize,
-	const coord_t clickScreenCoord ) const
+coord_t KController::calcCoordDelta(
+	coord_t deviceDimSize,
+	coord_t screenDimSize,
+	coord_t clickScreenCoord ) const
 {
 	coord_t result = 0;
 	if ( screenDimSize == deviceDimSize )
@@ -565,9 +561,9 @@ coord_t KController::calcCoordDelta(
 	return result;
 }
 
-void KController::correctPoint( 
-	const SBigRect& viewportRect, 
-	const SBigRect& clipRect, 
+void KController::correctPoint(
+	const SBigRect& viewportRect,
+	const SBigRect& clipRect,
 	SBigPoint* viewportCenter ) const
 {
 	correctCoord(

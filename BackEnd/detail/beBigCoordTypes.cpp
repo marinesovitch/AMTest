@@ -23,7 +23,7 @@ namespace utils
 coord_t big2coord( const big_coord_t coord )
 {
 	assert( isCoordInRange( coord ) );
-	const coord_t result = static_cast< coord_t >( coord );
+	const auto result = static_cast< coord_t >( coord );
 	return result;
 }
 
@@ -79,10 +79,10 @@ bool SBigPoint::operator!=( const SBigPoint& rhs ) const
 // ----------------------------------------------------------------------------
 
 SBigRect::SBigRect(
-	const big_coord_t l,
-	const big_coord_t t,
-	const big_coord_t r,
-	const big_coord_t b )
+	big_coord_t l,
+	big_coord_t t,
+	big_coord_t r,
+	big_coord_t b ) noexcept
 	: left( l )
 	, top( t ) 
 	, right( r )

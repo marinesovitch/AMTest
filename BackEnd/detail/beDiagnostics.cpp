@@ -74,11 +74,8 @@ void dumpPoint( const SPoint& point )
 
 void dumpPoints( const points_t& points )
 {
-	for ( points_cit it = points.begin()
-		; it != points.end()
-		; ++it )
+	for ( const SPoint& point : points )
 	{
-		const SPoint& point = *it;
 		dumpPoint( point );
 		std::cout << std::endl;
 	}
@@ -96,7 +93,7 @@ void dumpSegment( const SRawSegment& segment )
 void dumpRawSegments( const raw_segments_t& segments )
 {
 	int index = 0;
-	for ( raw_segments_cit it = segments.begin()
+	for ( auto it = segments.begin()
 		; it != segments.end()
 		; ++it, ++index )
 	{
@@ -112,11 +109,8 @@ void dumpPoints( const raw_segments_t& segments )
 {
 	points_t points;
 
-	for ( raw_segments_cit it = segments.begin()
-		; it != segments.end()
-		; ++it )
+	for ( const SRawSegment& segment : segments )
 	{
-		const SRawSegment& segment = *it;
 		const points_t& segmentPoints = segment.d_points;
 		points.insert( 
 			points.end(), 
@@ -169,11 +163,8 @@ void dumpSections(
 	if ( sections.size() < SectionsLimit )
 	{
 		SSection section;
-		for ( section_ids_cit it = sections.begin()
-			; it != sections.end()
-			; ++it )
+		for ( const section_id_t sectid : sections )
 		{
-			const section_id_t sectid = *it;
 			std::cout << sectid << ' ';
 			document->getSection( sectid, &section );
 			dumpPoint( *section.d_begin );

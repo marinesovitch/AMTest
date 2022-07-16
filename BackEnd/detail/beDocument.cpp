@@ -5,8 +5,4 @@
 namespace be
 {
 
-IDocument::~IDocument()
-{
-}
-
 } // namespace be

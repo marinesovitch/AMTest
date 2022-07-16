@@ -44,8 +44,8 @@ bool is_sorted( TIterator begin, TIterator end, TPred pred )
 }
 
 template< typename item_id_it >
-item_id_it get_median( 
-	item_id_it begin, 
+item_id_it get_median(
+	item_id_it begin,
 	item_id_it end )
 {
 	assert( begin != end );
@@ -75,22 +75,20 @@ void delete_container( TIterator begin, TIterator end )
 // ----------------------------------------------------------------------------
 
 template< typename TValue >
-inline bool isValueInRange( 
-	const TValue minPos, 
-	const TValue coord, 
-	const TValue maxPos, 
+inline bool isValueInRange(
+	const TValue minPos,
+	const TValue coord,
+	const TValue maxPos,
 	const bool includingMax )
 {
-	bool result = false;
 	if ( includingMax )
-		result = ( minPos <= coord ) && ( coord <= maxPos );
+		return ( minPos <= coord ) && ( coord <= maxPos );
 	else
-		result = ( minPos <= coord ) && ( coord < maxPos );
-	return result;
+		return ( minPos <= coord ) && ( coord < maxPos );
 }
 
 bool checkSectionLength( const SPoint& begin, const SPoint& end );
-bool isShiftOverflow( const coord_t coord, const int shiftCounter );
+bool isShiftOverflow( coord_t coord, int shiftCounter );
 
 } // namespace utils
 

@@ -17,13 +17,13 @@ bool checkSectionLength( const SPoint& begin, const SPoint& end )
 	const coord_t x1 = end.x;
 	const coord_t y0 = begin.y;
 	const coord_t y1 = end.y;
-	const bool result 
-		= std::abs( x1 - x0 ) < maxSectionLength 
+	const bool result
+		= std::abs( x1 - x0 ) < maxSectionLength
 		&& std::abs( y1 - y0 ) < maxSectionLength;
 	return result;
 }
 
-bool isShiftOverflow( const coord_t coord, const int shiftCounter )
+bool isShiftOverflow( coord_t coord, int shiftCounter )
 {
 	const coord_t shiftedCoord = coord << shiftCounter;
 	const big_coord_t bigCoord = static_cast< big_coord_t >( coord ) << shiftCounter;

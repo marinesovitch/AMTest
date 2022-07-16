@@ -13,10 +13,10 @@ namespace be
 namespace
 {
 
-const int StreamTerminator = 0x89ABCDEF;
+const int StreamTerminator = int(0x89ABCDEF);
 
 // see description of format at KMapReader
-static const int s_rawDataStream[] = 
+const int s_rawDataStream[] =
 {
 	1, // number of segments
 
@@ -215,7 +215,7 @@ class KArrayMapStream : public IMapStream
 			const int* end );
 
 	public:
-		virtual bool getInt( int* value );
+		bool getInt( int* value ) override;
 
 	private:
 		const int* d_it;
@@ -252,14 +252,14 @@ class KFileMapStream : public IMapStream
 {
 	public:
 		KFileMapStream();
-		virtual ~KFileMapStream();
+		~KFileMapStream() override;
 
 	public:
 		 bool open( const std::string& fname );
-		 bool open( const int fileDescriptor, const long offset );
+		 bool open( int fileDescriptor, long offset );
 
 	public:
-		virtual bool getInt( int* value );
+		bool getInt( int* value ) override;
 
 	private:
 		FILE* d_file;
@@ -269,35 +269,35 @@ class KFileMapStream : public IMapStream
 // ----------------------------------------------------------------------------
 
 KFileMapStream::KFileMapStream()
-	: d_file( 0 )
+	: d_file(nullptr )
 {
 }
 
 KFileMapStream::~KFileMapStream()
 {
-	if ( d_file != 0 )
+	if ( d_file )
 		fclose( d_file );
 }
 
 bool KFileMapStream::open( const std::string& fname )
 {
-	assert( d_file == 0 );
+	assert( d_file == nullptr );
 	d_file = fopen( fname.c_str(), "rb" );
-	const bool result = ( d_file != 0 );
+	const bool result = ( d_file != nullptr );
 	return result;
 }
 
 bool KFileMapStream::open( const int fileDescriptor, const long offset )
 {
-	assert( d_file == 0 );
+	assert( d_file == nullptr );
 	d_file = fdopen( fileDescriptor, "rb" );
-	const bool result = ( d_file != 0 ) && ( fseek( d_file, offset, SEEK_SET ) == 0 );
+	const bool result = ( d_file != nullptr ) && ( fseek( d_file, offset, SEEK_SET ) == 0 );
 	return result;
 }
 
 bool KFileMapStream::getInt( int* value )
 {
-	assert( d_file != 0 );
+	assert( d_file != nullptr );
 	const bool result = ( fread( value, sizeof( *value ), 1, d_file ) == 1 );
 	return result;
 }
@@ -309,22 +309,22 @@ bool KFileMapStream::getInt( int* value )
 
 IMapStream* IMapStream::create( const std::string& fname )
 {
-	KFileMapStream* mapStream = new KFileMapStream();
+	auto mapStream = new KFileMapStream();
 	if ( !mapStream->open( fname ) )
 	{
 		delete mapStream;
-		mapStream = 0;
+		mapStream = nullptr;
 	}
 	return mapStream;
 }
 
 IMapStream* IMapStream::create( const int fileDescriptor, const long offset )
 {
-	KFileMapStream* mapStream = new KFileMapStream();
+	auto mapStream = new KFileMapStream();
 	if ( !mapStream->open( fileDescriptor, offset ) )
 	{
 		delete mapStream;
-		mapStream = 0;
+		mapStream = nullptr;
 	}
 	return mapStream;
 }
@@ -342,12 +342,6 @@ IMapStream* IMapStream::create()
 			s_rawDataStream,
 			s_rawDataStream + ( sizeof( s_rawDataStream ) / sizeof( s_rawDataStream[ 0 ] ) ) );
 	return mapStream;
-}
-
-// ----------------------------------------------------------------------------
-
-IMapStream::~IMapStream()
-{
 }
 
 } // namespace be

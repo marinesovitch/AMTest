@@ -10,7 +10,7 @@ namespace be
 struct IBitmap
 {
 	public:
-		virtual ~IBitmap();
+		virtual ~IBitmap() = default;
 
 	public:
 		virtual bool lock( color_t** buffer ) = 0;

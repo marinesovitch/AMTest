@@ -7,7 +7,7 @@
 namespace be
 {
 
-typedef long long big_coord_t;
+using big_coord_t = long long;
 
 namespace utils
 {
@@ -37,12 +37,15 @@ struct SBigPoint
 	SBigPoint(
 		const big_coord_t x = 0,
 		const big_coord_t y = 0 );
-	SBigPoint(
+	explicit SBigPoint(
 		const SPoint& point );
 
 	SPoint getPoint() const;
 
 	bool operator!=( const SBigPoint& rhs ) const;
+	bool operator!=( const SPoint& rhs ) const {
+		return operator!=(SBigPoint(rhs));
+	}
 
 	big_coord_t x;
 	big_coord_t y;
@@ -53,11 +56,11 @@ struct SBigPoint
 struct SBigRect
 {
 	SBigRect(
-		const big_coord_t left = 0,
-		const big_coord_t top = 0,
-		const big_coord_t right = 0,
-		const big_coord_t bottom = 0 );
-	SBigRect(
+		big_coord_t left = 0,
+		big_coord_t top = 0,
+		big_coord_t right = 0,
+		big_coord_t bottom = 0 ) noexcept;
+	explicit SBigRect(
 		const SRect& rect );
 	SBigRect(
 		const SBigPoint& topLeft,
@@ -66,7 +69,7 @@ struct SBigRect
 	SRect getRect() const;
 
 	big_coord_t left;
-	big_coord_t top; 
+	big_coord_t top;
 	big_coord_t right;
 	big_coord_t bottom;
 };

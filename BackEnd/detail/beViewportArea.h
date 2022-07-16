@@ -31,7 +31,7 @@ class KViewportArea
 {
 	public:
 		KViewportArea( const SRect& rc );
-		~KViewportArea();
+		~KViewportArea() = default;
 
 	public:
 		const SViewportBorder& getLeftEdge() const;

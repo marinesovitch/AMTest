@@ -14,11 +14,11 @@ namespace
 
 class KPainter;
 
-typedef void (KPainter::*TDrawJunctionFunc)( const SPoint& junction );
+using TDrawJunctionFunc = void (KPainter::*)( const SPoint& junction );
 
-typedef std::pair< EOrientation, EOrientation > orientation_pair_t;
-typedef std::map< orientation_pair_t, TDrawJunctionFunc > orientations2junction_t;
-typedef orientations2junction_t::const_iterator orientations2junction_cit;
+using orientation_pair_t = std::pair< EOrientation, EOrientation >;
+using orientations2junction_t = std::map< orientation_pair_t, TDrawJunctionFunc >;
+using orientations2junction_cit = orientations2junction_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ int calcRowShift( const int columns )
 
 bool isSectionNormalized( const SPoint& begin, const SPoint& end )
 {
-	const bool result = ( begin.x < end.x ) 
+	const bool result = ( begin.x < end.x )
 		|| ( ( begin.x == end.x ) && ( begin.y <= end.y ) );
 	return result;
 }
@@ -107,23 +107,23 @@ int calcRoadClassFilter( const SContentsGeneratorData* generatorData )
 class KPixelArray
 {
 	public:
-		KPixelArray( const SSize& deviceSize, const color_t bkColor );
+		KPixelArray( const SSize& deviceSize, color_t bkColor );
 		~KPixelArray();
 
 	public:
-		void putPixel( const coord_t x, const coord_t y );
-		void putOutlinePixel( const coord_t x, const coord_t y );
+		void putPixel( coord_t x, coord_t y );
+		void putOutlinePixel( coord_t x, coord_t y );
 
-		void setColor( const color_t color );
-		void setOutlineColor( const color_t outlineColor );
+		void setColor( color_t color );
+		void setOutlineColor( color_t outlineColor );
 
 	public:
 		void fillBackground();
 		void dump( color_t* dest ) const;
 
 	private:
-		bool checkPixelPos( const coord_t x, const coord_t y ) const;
-		int calcIndex( const coord_t x, const coord_t y ) const;
+		bool checkPixelPos( coord_t x, coord_t y ) const;
+		int calcIndex( coord_t x, coord_t y ) const;
 
 		const int d_deviceRows;
 		const int d_deviceColumns;
@@ -143,13 +143,13 @@ class KPixelArray
 
 // ----------------------------------------------------------------------------
 
-KPixelArray::KPixelArray( 
+KPixelArray::KPixelArray(
 	const SSize& deviceSize,
 	const color_t bkColor )
 	: d_deviceRows( deviceSize.height )
 	, d_deviceColumns( deviceSize.width )
 	, d_deviceRowShift( calcRowShift( d_deviceColumns ) )
-	, d_alignedColumns( 1 << d_deviceRowShift ) 
+	, d_alignedColumns( 1 << d_deviceRowShift )
 	, d_pixels( new color_t[ d_deviceRows * d_alignedColumns ] )
 	, d_bkColor( bkColor )
 	, d_color( 0 )
@@ -167,9 +167,9 @@ KPixelArray::~KPixelArray()
 
 // ----------------------------------------------------------------------------
 
-inline void KPixelArray::putPixel( 
-	const coord_t x, 
-	const coord_t y )
+inline void KPixelArray::putPixel(
+	coord_t x,
+	coord_t y )
 {
 	if ( checkPixelPos( x, y ) )
 	{
@@ -179,8 +179,8 @@ inline void KPixelArray::putPixel(
 }
 
 inline void KPixelArray::putOutlinePixel(
-	const coord_t x, 
-	const coord_t y )
+	coord_t x,
+	coord_t y )
 {
 	if ( checkPixelPos( x, y ) )
 	{
@@ -209,7 +209,7 @@ void KPixelArray::fillBackground()
 	for ( int i = 0; i < d_deviceRows; ++i )
 	{
 		color_t* currentPixel = currentRow;
-		for ( int i = 0; i < d_deviceColumns; ++i, ++currentPixel )
+		for ( int j = 0; j < d_deviceColumns; ++j, ++currentPixel )
 		{
 			if ( *currentPixel == 0 )
 				*currentPixel = d_bkColor;
@@ -224,7 +224,7 @@ void KPixelArray::dump( color_t* dest ) const
 	{
 		color_t* srcRow = d_pixels;
 		color_t* destRow = dest;
-		const int rowLength = d_deviceColumns * sizeof( color_t );
+		const std::size_t rowLength = d_deviceColumns * sizeof( color_t );
 		for ( int i = 0; i < d_deviceRows; ++i )
 		{
 			memcpy( destRow, srcRow, rowLength );
@@ -240,15 +240,15 @@ void KPixelArray::dump( color_t* dest ) const
 
 // ----------------------------------------------------------------------------
 
-inline bool KPixelArray::checkPixelPos( const coord_t x, const coord_t y ) const
+inline bool KPixelArray::checkPixelPos( coord_t x, coord_t y ) const
 {
-	const bool result 
+	const bool result
 		= utils::isValueInRange( 0, x, d_deviceColumns, false )
 		&& utils::isValueInRange( 0, y, d_deviceRows, false );
 	return result;
 }
 
-inline int KPixelArray::calcIndex( const coord_t x, const coord_t y ) const
+inline int KPixelArray::calcIndex( coord_t x, coord_t y ) const
 {
 	const int index = ( y << d_deviceRowShift ) + x;
 	return index;
@@ -260,10 +260,10 @@ inline int KPixelArray::calcIndex( const coord_t x, const coord_t y ) const
 class KPainter
 {
 	public:
-		KPainter( 
-			const SSize& deviceSize, 
-			const SSize& screenSize, 
-			const color_t bkColor );
+		KPainter(
+			const SSize& deviceSize,
+			const SSize& screenSize,
+			color_t bkColor );
 
 	public:
 		void dump( IBitmap* bitmap );
@@ -272,92 +272,92 @@ class KPainter
 			const SPoint& begin,
 			const SPoint& end,
 			const SRoadClass* roadClass,
-			const EOrientation orientation );
+			EOrientation orientation );
 
 	private:
-		typedef void (KPainter::*TPutPixelFunc)( const coord_t x, const coord_t y );
+		using TPutPixelFunc = void (KPainter::*)( coord_t x, coord_t y );
 
-		void drawLine( 
-			const EOrientation orientation,
-			TPutPixelFunc horzPutPixelFunc, 
+		void drawLine(
+			EOrientation orientation,
+			TPutPixelFunc horzPutPixelFunc,
 			TPutPixelFunc vertPutPixelFunc );
 
 		void drawHorzLine(
-			const coord_t x0,
-			const coord_t x1,
-			const coord_t y,
+			coord_t x0,
+			coord_t x1,
+			coord_t y,
 			TPutPixelFunc putPixelFunc );
-		void drawVertLine( 
-			const coord_t y0,
-			const coord_t y1,
-			const coord_t x,
+		void drawVertLine(
+			coord_t y0,
+			coord_t y1,
+			coord_t x,
 			TPutPixelFunc putPixelFunc );
 		void drawInclinedLine( TPutPixelFunc putPixelFunc );
-		void drawHorzInclinedLine( 
-			const coord_t dx,
-			const coord_t dy,
-			const coord_t xi,
-			const coord_t yi,
+		void drawHorzInclinedLine(
+			coord_t dx,
+			coord_t dy,
+			coord_t xi,
+			coord_t yi,
 			TPutPixelFunc putPixelFunc );
-		void drawVertInclinedLine( 
-			const coord_t dx,
-			const coord_t dy,
-			const coord_t xi,
-			const coord_t yi,
+		void drawVertInclinedLine(
+			coord_t dx,
+			coord_t dy,
+			coord_t xi,
+			coord_t yi,
 			TPutPixelFunc putPixelFunc );
 
 	private:
 		void initOrientations2junction();
 		void addOrientations2junction(
-			const EOrientation first,
-			const EOrientation second,
+			EOrientation first,
+			EOrientation second,
 			TDrawJunctionFunc drawJunctionFunc );
 
 		void drawJunction(
 			const SRoadClass* roadClass,
-			const EOrientation orientation );
+			EOrientation orientation );
 
-		bool isJunctionByDefault( const orientation_pair_t prev2current ) const;
+		bool isJunctionByDefault( orientation_pair_t prev2current ) const;
 
 		bool findJunctionPoint( SPoint* junctionPoint ) const;
 
 		void drawJunctionRect( const SPoint& junction );
 		void fillJunctionRect(
-			const coord_t x0,
-			const coord_t y0,
-			const coord_t x1,
-			const coord_t y1 );
+			coord_t x0,
+			coord_t y0,
+			coord_t x1,
+			coord_t y1 );
 
 		void drawJunctionDiamond( const SPoint& junction );
 		void drawRightInclinedLine(
-			const coord_t x0,
-			const coord_t y0,
-			const coord_t x1,
+			coord_t x0,
+			coord_t y0,
+			coord_t x1,
 			TPutPixelFunc putPixelFunc );
 		void drawLeftInclinedLine(
-			const coord_t x0,
-			const coord_t y0,
-			const coord_t x1,
+			coord_t x0,
+			coord_t y0,
+			coord_t x1,
 			TPutPixelFunc putPixelFunc );
 
 	private:
-		void putSinglePixel( const coord_t x, const coord_t y );
-		void putSingleOutlinePixel( const coord_t x, const coord_t y );
+		void putSinglePixel( coord_t x, coord_t y );
+		void putSingleOutlinePixel( coord_t x, coord_t y );
 
-		void putHorzThickPixel( const coord_t x, const coord_t y );
-		void putVertThickPixel( const coord_t x, const coord_t y );
+		void putHorzThickPixel( coord_t x, coord_t y );
+		void putVertThickPixel( coord_t x, coord_t y );
 
-		void putHorzThickPixelWithOutline( const coord_t x, const coord_t y );
-		void putVertThickPixelWithOutline( const coord_t x, const coord_t y );
+		void putHorzThickPixelWithOutline( coord_t x, coord_t y );
+		void putVertThickPixelWithOutline( coord_t x, coord_t y );
 
 	private:
 		void prepareInclinedSection();
 		coord_t calcInclinedSectionEndPos(
-			const coord_t rawEndPos,
-			const coord_t step,
-			const coord_t screenDim ) const;
+			coord_t rawEndPos,
+			coord_t step,
+			coord_t screenDim ) const;
 
-		bool isPixelInScreenArea( const coord_t x, const coord_t y ) const;
+		bool isPixelInScreenArea( coord_t x, coord_t y ) const;
 
 	private:
 		const coord_t d_screenWidth;
@@ -390,9 +390,9 @@ orientations2junction_t KPainter::s_orientations2junction;
 
 // ----------------------------------------------------------------------------
 
-KPainter::KPainter( 
-	const SSize& deviceSize, 
-	const SSize& screenSize, 
+KPainter::KPainter(
+	const SSize& deviceSize,
+	const SSize& screenSize,
 	const color_t bkColor )
 	: d_screenWidth( screenSize.width )
 	, d_screenHeight( screenSize.height )
@@ -411,7 +411,7 @@ KPainter::KPainter(
 
 void KPainter::dump( IBitmap* bitmap )
 {
-	color_t* buffer = 0;
+	color_t* buffer = nullptr;
 	if ( bitmap->lock( &buffer ) )
 	{
 		d_pixelArray.fillBackground();
@@ -441,9 +441,9 @@ void KPainter::drawSection(
 	{
 		d_beginOffset = 0;
 		d_endOffset = 0;
-		drawLine( 
-			orientation, 
-			&KPainter::putSinglePixel, 
+		drawLine(
+			orientation,
+			&KPainter::putSinglePixel,
 			&KPainter::putSinglePixel );
 	}
 	else
@@ -459,7 +459,7 @@ void KPainter::drawSection(
 
 			drawLine(
 				orientation,
-				&KPainter::putHorzThickPixelWithOutline, 
+				&KPainter::putHorzThickPixelWithOutline,
 				&KPainter::putVertThickPixelWithOutline );
 			drawJunction( roadClass, orientation );
 		}
@@ -467,7 +467,7 @@ void KPainter::drawSection(
 		{
 			drawLine(
 				orientation,
-				&KPainter::putHorzThickPixel, 
+				&KPainter::putHorzThickPixel,
 				&KPainter::putVertThickPixel );
 			drawJunction( roadClass, orientation );
 		}
@@ -479,9 +479,9 @@ void KPainter::drawSection(
 	d_prevOrientation = orientation;
 }
 
-void KPainter::drawLine( 
+void KPainter::drawLine(
 	const EOrientation orientation,
-	TPutPixelFunc horzPutPixelFunc, 
+	TPutPixelFunc horzPutPixelFunc,
 	TPutPixelFunc vertPutPixelFunc )
 {
 	switch ( orientation )
@@ -507,10 +507,10 @@ void KPainter::drawLine(
 	}
 }
 
-void KPainter::drawHorzLine( 
-	const coord_t x0,
-	const coord_t x1,
-	const coord_t y,
+void KPainter::drawHorzLine(
+	coord_t x0,
+	coord_t x1,
+	coord_t y,
 	TPutPixelFunc putPixelFunc )
 {
 	assert( x0 <= x1 );
@@ -520,10 +520,10 @@ void KPainter::drawHorzLine(
 	}
 }
 
-void KPainter::drawVertLine( 
-	const coord_t y0,
-	const coord_t y1,
-	const coord_t x,
+void KPainter::drawVertLine(
+	coord_t y0,
+	coord_t y1,
+	coord_t x,
 	TPutPixelFunc putPixelFunc )
 {
 	assert( y0 <= y1 );
@@ -544,23 +544,23 @@ void KPainter::drawInclinedLine( TPutPixelFunc putPixelFunc )
 	coord_t yi = 0;
 
 	if ( d_x0 < d_x1 )
-	{ 
+	{
 		dx = d_x1 - d_x0;
 		xi = 1;
-	} 
+	}
 	else
-	{ 
+	{
 		dx = d_x0 - d_x1;
 		xi = -1;
 	}
-     
+
 	if ( d_y0 < d_y1 )
-	{ 
+	{
 		dy = d_y1 - d_y0;
 		yi = 1;
-	} 
+	}
 	else
-	{ 
+	{
 		dy = d_y0 - d_y1;
 		yi = -1;
 	}
@@ -573,11 +573,11 @@ void KPainter::drawInclinedLine( TPutPixelFunc putPixelFunc )
 		drawVertInclinedLine( dx, dy, xi, yi, putPixelFunc );
 }
 
-void KPainter::drawHorzInclinedLine( 
-	const coord_t dx,
-	const coord_t dy,
-	const coord_t xi,
-	const coord_t yi,
+void KPainter::drawHorzInclinedLine(
+	coord_t dx,
+	coord_t dy,
+	coord_t xi,
+	coord_t yi,
 	TPutPixelFunc putPixelFunc )
 {
 	const coord_t dd = ( dy - dx ) << 1;
@@ -590,7 +590,7 @@ void KPainter::drawHorzInclinedLine(
 
 	const coord_t x_end = calcInclinedSectionEndPos( d_x1, xi, d_screenWidth );
 
-	if ( ( ( 0 < xi ) && ( x < x_end ) ) 
+	if ( ( ( 0 < xi ) && ( x < x_end ) )
 		|| ( ( xi < 0 ) && ( x_end < x ) ) )
 	{
 		do
@@ -599,10 +599,10 @@ void KPainter::drawHorzInclinedLine(
 
 			x += xi;
 			if ( 0 <= di )
-			{ 
+			{
 				y += yi;
 				di += dd;
-			} 
+			}
 			else
 			{
 				di += dp;
@@ -612,11 +612,11 @@ void KPainter::drawHorzInclinedLine(
 	}
 }
 
-void KPainter::drawVertInclinedLine( 
-	const coord_t dx,
-	const coord_t dy,
-	const coord_t xi,
-	const coord_t yi,
+void KPainter::drawVertInclinedLine(
+	coord_t dx,
+	coord_t dy,
+	coord_t xi,
+	coord_t yi,
 	TPutPixelFunc putPixelFunc )
 {
 	const coord_t dd = ( dx - dy ) << 1;
@@ -629,7 +629,7 @@ void KPainter::drawVertInclinedLine(
 
 	const coord_t y_end = calcInclinedSectionEndPos( d_y1, yi, d_screenHeight );
 
-	if ( ( ( 0 < yi ) && ( y < y_end ) ) 
+	if ( ( ( 0 < yi ) && ( y < y_end ) )
 		|| ( ( yi < 0 ) && ( y_end < y ) ) )
 	{
 		do
@@ -638,10 +638,10 @@ void KPainter::drawVertInclinedLine(
 
 			y += yi;
 			if ( 0 <= di )
-			{ 
+			{
 				x += xi;
 				di += dd;
-			} 
+			}
 			else
 			{
 				di += dp;
@@ -699,10 +699,10 @@ void KPainter::drawJunction(
 	}
 }
 
-bool KPainter::isJunctionByDefault( const orientation_pair_t prev2current ) const
+bool KPainter::isJunctionByDefault( orientation_pair_t prev2current ) const
 {
-	typedef std::set< orientation_pair_t > orientationset_t;
-	typedef orientationset_t::const_iterator orientationset_cit;
+	using orientationset_t = std::set< orientation_pair_t >;
+	using orientationset_cit = orientationset_t::const_iterator;
 
 	static orientationset_t s_orientationset;
 	if ( s_orientationset.empty() )
@@ -715,7 +715,7 @@ bool KPainter::isJunctionByDefault( const orientation_pair_t prev2current ) cons
 		s_orientationset.insert( std::make_pair( InclinedVertical, Vertical ) );
 	}
 
-	orientationset_cit it = s_orientationset.find( prev2current );
+	auto it = s_orientationset.find( prev2current );
 	const bool result = ( it != s_orientationset.end() ) || ( prev2current.first == UnknownOrientation );
 	return result;
 }
@@ -760,10 +760,10 @@ void KPainter::drawJunctionRect( const SPoint& junction )
 }
 
 void KPainter::fillJunctionRect(
-	const coord_t x0,
-	const coord_t y0,
-	const coord_t x1,
-	const coord_t y1 )
+	coord_t x0,
+	coord_t y0,
+	coord_t x1,
+	coord_t y1 )
 {
 	for ( coord_t y = y0; y <= y1; ++y )
 	{
@@ -783,7 +783,7 @@ void KPainter::drawJunctionDiamond( const SPoint& junction )
 		; x0 != junction_x
 		; ++i, ++x0, ++y0, --x1, --y1 )
 	{
-		TPutPixelFunc putPixelFunc 
+		TPutPixelFunc putPixelFunc
 			= ( i < d_outlineThickness )
 				? &KPainter::putSingleOutlinePixel : &KPainter::putSinglePixel;
 		drawRightInclinedLine( x0, junction_y, junction_x, putPixelFunc );
@@ -794,9 +794,9 @@ void KPainter::drawJunctionDiamond( const SPoint& junction )
 }
 
 void KPainter::drawRightInclinedLine(
-	const coord_t x0,
-	const coord_t y0,
-	const coord_t x1,
+	coord_t x0,
+	coord_t y0,
+	coord_t x1,
 	TPutPixelFunc putPixelFunc )
 {
 	for ( coord_t x = x0, y = y0
@@ -808,9 +808,9 @@ void KPainter::drawRightInclinedLine(
 }
 
 void KPainter::drawLeftInclinedLine(
-	const coord_t x0,
-	const coord_t y0,
-	const coord_t x1,
+	coord_t x0,
+	coord_t y0,
+	coord_t x1,
 	TPutPixelFunc putPixelFunc )
 {
 	for ( coord_t x = x0, y = y0
@@ -823,23 +823,23 @@ void KPainter::drawLeftInclinedLine(
 
 // ----------------------------------------------------------------------------
 
-inline void KPainter::putSinglePixel( 
-	const coord_t x, 
-	const coord_t y )
+inline void KPainter::putSinglePixel(
+	coord_t x,
+	coord_t y )
 {
 	d_pixelArray.putPixel( x, y );
 }
 
-inline void KPainter::putSingleOutlinePixel( 
-	const coord_t x, 
-	const coord_t y )
+inline void KPainter::putSingleOutlinePixel(
+	coord_t x,
+	coord_t y )
 {
 	d_pixelArray.putOutlinePixel( x, y );
 }
 
 void KPainter::putHorzThickPixel(
-	const coord_t x, 
-	const coord_t init_y )
+	coord_t x,
+	coord_t init_y )
 {
 	const coord_t begin_y = std::max( 0, init_y + d_beginOffset );
 	const coord_t end_y = std::min( init_y + d_endOffset, d_screenHeight );
@@ -851,8 +851,8 @@ void KPainter::putHorzThickPixel(
 }
 
 void KPainter::putVertThickPixel(
-	const coord_t init_x, 
-	const coord_t y )
+	coord_t init_x,
+	coord_t y )
 {
 	const coord_t begin_x = std::max( 0, init_x + d_beginOffset );
 	const coord_t end_x = std::min( init_x + d_endOffset, d_screenWidth );
@@ -864,8 +864,8 @@ void KPainter::putVertThickPixel(
 }
 
 void KPainter::putHorzThickPixelWithOutline(
-	const coord_t x, 
-	const coord_t init_y )
+	coord_t x,
+	coord_t init_y )
 {
 	const coord_t raw_begin_y = init_y + d_beginOffset;
 	const coord_t raw_end_y = init_y + d_endOffset;
@@ -884,8 +884,8 @@ void KPainter::putHorzThickPixelWithOutline(
 }
 
 void KPainter::putVertThickPixelWithOutline(
-	const coord_t init_x, 
-	const coord_t y )
+	coord_t init_x,
+	coord_t y )
 {
 	const coord_t raw_begin_x = init_x + d_beginOffset;
 	const coord_t raw_end_x = init_x + d_endOffset;
@@ -916,10 +916,10 @@ void KPainter::prepareInclinedSection()
 	}
 }
 
-coord_t KPainter::calcInclinedSectionEndPos( 
-	const coord_t rawEndPos,
-	const coord_t step,
-	const coord_t screenDim ) const
+coord_t KPainter::calcInclinedSectionEndPos(
+	coord_t rawEndPos,
+	coord_t step,
+	coord_t screenDim ) const
 {
 	/*
 		d_beginOffset/d_endOffset are used, so center of section may
@@ -934,9 +934,9 @@ coord_t KPainter::calcInclinedSectionEndPos(
 	return result;
 }
 
-inline bool KPainter::isPixelInScreenArea( const coord_t x, const coord_t y ) const
+inline bool KPainter::isPixelInScreenArea( coord_t x, coord_t y ) const
 {
-	const bool result 
+	const bool result
 		= utils::isValueInRange( 0, x, d_screenWidth, false )
 		&& utils::isValueInRange( 0, y, d_screenHeight, false );
 	return result;
@@ -945,33 +945,33 @@ inline bool KPainter::isPixelInScreenArea( const coord_t x, const coord_t y ) co
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-coord_t prepareMinCatchCoord( 
-	const coord_t clipPos,
-	const coord_t clipTolerance )
+coord_t prepareMinCatchCoord(
+	coord_t clipPos,
+	coord_t clipTolerance )
 {
 	coord_t result = 0;
 	if ( consts::MinCoord + clipTolerance < clipPos)
 		result = clipPos - clipTolerance;
-	else 
+	else
 		result = consts::MinCoord;
 	return result;
 }
 
-coord_t prepareMaxCatchCoord( 
-	const coord_t clipPos,
-	const coord_t clipTolerance )
+coord_t prepareMaxCatchCoord(
+	coord_t clipPos,
+	coord_t clipTolerance )
 {
 	coord_t result = 0;
 	if ( clipPos < consts::MaxCoord - clipTolerance )
 		result = clipPos + clipTolerance;
-	else 
+	else
 		result = consts::MaxCoord;
 	return result;
 }
 
-SRect prepareClipRect( 
+SRect prepareClipRect(
 	const SRect& clipRect,
-	const coord_t clipTolerance )
+	coord_t clipTolerance )
 {
 	const coord_t left = prepareMinCatchCoord( clipRect.left, clipTolerance );
 	const coord_t top = prepareMinCatchCoord( clipRect.top, clipTolerance );
@@ -989,12 +989,12 @@ class KClipSection
 	public:
 		KClipSection(
 			const SRect& clipRect,
-			const int clipExtraTolerance,
+			int clipExtraTolerance,
 			SPoint* begin,
 			SPoint* end );
 
 	public:
-		bool run( const EOrientation orientation );
+		bool run( EOrientation orientation );
 
 	private:
 		bool clipHorizontalSection();
@@ -1006,18 +1006,18 @@ class KClipSection
 
 		void clearRestFlags();
 
-		void calcCenter( 
-			const SPoint& begin, 
-			const SPoint& end, 
+		void calcCenter(
+			const SPoint& begin,
+			const SPoint& end,
 			SPoint* middle );
 		coord_t calcCenterCoord(
-			const coord_t begin, 
-			const coord_t end, 
+			coord_t begin,
+			coord_t end,
 			bool* restFlag );
 
 		void clipCoord(
-			const coord_t minPos, 
-			const coord_t maxPos, 
+			coord_t minPos,
+			coord_t maxPos,
 			coord_t* coord ) const;
 
 	private:
@@ -1025,7 +1025,7 @@ class KClipSection
 		const SRect d_catchRect;
 
 		const coord_t d_left;
-		const coord_t d_top; 
+		const coord_t d_top;
 		const coord_t d_right;
 		const coord_t d_bottom;
 
@@ -1047,7 +1047,7 @@ KClipSection::KClipSection(
 	: d_clipRect( prepareClipRect( clipRect, clipExtraTolerance ) )
 	, d_catchRect( prepareClipRect( d_clipRect, ClipCatchTolerance ) )
 	, d_left( d_clipRect.left )
-	, d_top( d_clipRect.top ) 
+	, d_top( d_clipRect.top )
 	, d_right( d_clipRect.right )
 	, d_bottom( d_clipRect.bottom )
 	, d_restFlagX( false )
@@ -1058,7 +1058,7 @@ KClipSection::KClipSection(
 	assert( isSectionNormalized( d_begin, d_end ) );
 }
 
-bool KClipSection::run( const EOrientation orientation )
+bool KClipSection::run( EOrientation orientation )
 {
 	bool result = false;
 	switch ( orientation)
@@ -1126,7 +1126,7 @@ bool KClipSection::clipInclinedSection()
 			normalize = true;
 		}
 	}
-	else 
+	else
 	{
 		if ( d_clipRect.contains( d_end ) )
 		{
@@ -1179,15 +1179,15 @@ bool KClipSection::findSplitPoint( SPoint* splitPoint )
 			( vertGrowing ? d_begin : d_end ) = *splitPoint;
 		else if ( d_bottom < splitPoint->y )
 			( vertGrowing ? d_end : d_begin ) = *splitPoint;
-		else 
+		else
 		{
 			assert( d_clipRect.contains( *splitPoint ) );
 			found = true;
 			search = false;
 		}
 
-		if ( ( std::abs( splitPoint->x - prevSplitPoint.x ) <= SplitPointTolerance ) 
-			&& ( std::abs( splitPoint->y - prevSplitPoint.y ) <= SplitPointTolerance ) ) 
+		if ( ( std::abs( splitPoint->x - prevSplitPoint.x ) <= SplitPointTolerance )
+			&& ( std::abs( splitPoint->y - prevSplitPoint.y ) <= SplitPointTolerance ) )
 		{
 			search = false;
 		}
@@ -1225,9 +1225,9 @@ void KClipSection::clearRestFlags()
 	d_restFlagY = false;
 }
 
-void KClipSection::calcCenter( 
-	const SPoint& begin, 
-	const SPoint& end, 
+void KClipSection::calcCenter(
+	const SPoint& begin,
+	const SPoint& end,
 	SPoint* middle )
 {
 	middle->x = calcCenterCoord( begin.x, end.x, &d_restFlagX );
@@ -1235,8 +1235,8 @@ void KClipSection::calcCenter(
 }
 
 coord_t KClipSection::calcCenterCoord(
-	const coord_t begin, 
-	const coord_t end, 
+	coord_t begin,
+	coord_t end,
 	bool* restFlag )
 {
 	const coord_t diff = end - begin;
@@ -1258,9 +1258,9 @@ coord_t KClipSection::calcCenterCoord(
 	return result;
 }
 
-void KClipSection::clipCoord( 
-	const coord_t minPos, 
-	const coord_t maxPos, 
+void KClipSection::clipCoord(
+	coord_t minPos,
+	coord_t maxPos,
 	coord_t* coord ) const
 {
 	if ( *coord < minPos )
@@ -1273,9 +1273,9 @@ void KClipSection::clipCoord(
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-struct zoom_out 
+struct zoom_out
 {
-	zoom_out( const int zoomFactor ) : d_zoomFactor( zoomFactor )
+	explicit zoom_out( int zoomFactor ) : d_zoomFactor( zoomFactor )
 	{
 	}
 
@@ -1293,7 +1293,7 @@ struct zoom_out
 
 struct no_zoom
 {
-	no_zoom( const int /*zoomFactor*/ )
+	explicit no_zoom( const int /*zoomFactor*/ )
 	{
 	}
 
@@ -1308,7 +1308,7 @@ struct no_zoom
 
 struct zoom_in
 {
-	zoom_in( const int zoomFactor ) : d_zoomFactor( zoomFactor )
+	explicit zoom_in( int zoomFactor ) : d_zoomFactor( zoomFactor )
 	{
 	}
 
@@ -1332,14 +1332,14 @@ struct zoom_in
 class KContentsGenerator
 {
 	public:
-		KContentsGenerator( SContentsGeneratorData* generatorData );
+		explicit KContentsGenerator( SContentsGeneratorData* generatorData );
 		~KContentsGenerator();
 
 	private:
 		void prepareRoadClasses( const road_classes_t& baseRoadClasses );
 		SRoadClass* prepareRoadClass( const SRoadClass* baseRoadClass ) const;
-		coord_t prepareRoadClassThickness( const coord_t defaultThickness ) const;
-		coord_t prepareRoadClassOutlineThickness( const coord_t defaultThickness ) const;
+		coord_t prepareRoadClassThickness( coord_t defaultThickness ) const;
+		coord_t prepareRoadClassOutlineThickness( coord_t defaultThickness ) const;
 
 	public:
 		bool run( SContentsGeneratorData* generatorData );
@@ -1374,11 +1374,11 @@ class KContentsGenerator
 		EOrientation calcSectionOrientation() const;
 		coord_t calcClipTolerance() const;
 
-		void prepareScreenPoint( 
-			const SPoint& viewportTopLeftCorner, 
+		void prepareScreenPoint(
+			const SPoint& viewportTopLeftCorner,
 			SPoint* point ) const;
 
-		bool clipSection( const SRect& clipRect, const int clipExtraTolerance );
+		bool clipSection( const SRect& clipRect, int clipExtraTolerance );
 
 	private:
 		const SRect d_viewportRect;
@@ -1411,11 +1411,11 @@ KContentsGenerator::KContentsGenerator( SContentsGeneratorData* generatorData )
 	, d_zoomFactor( generatorData->d_viewData.d_zoomFactor )
 	, d_isZoomIn( d_zoomFactor < 0 )
 	, d_roadClassFilter( calcRoadClassFilter( generatorData ) )
-	, d_painter( 
-		generatorData->d_viewData.d_deviceSize, 
-		generatorData->d_viewData.d_screenSize, 
+	, d_painter(
+		generatorData->d_viewData.d_deviceSize,
+		generatorData->d_viewData.d_screenSize,
 		consts::BackgroundColor )
-	, d_roadClass( 0 )
+	, d_roadClass(nullptr )
 	, d_orientation( UnknownOrientation )
 {
 	const IInternalDocument& document = generatorData->d_document;
@@ -1428,40 +1428,37 @@ KContentsGenerator::~KContentsGenerator()
 	utils::delete_container( d_roadClasses.begin(), d_roadClasses.end() );
 }
 
-void KContentsGenerator::prepareRoadClasses( 
+void KContentsGenerator::prepareRoadClasses(
 	const road_classes_t& baseRoadClasses )
 {
-	for ( road_classes_cit it = baseRoadClasses.begin()
-		; it != baseRoadClasses.end()
-		; ++it )
+	for ( const SRoadClass* baseRoadClass : baseRoadClasses )
 	{
-		const SRoadClass* baseRoadClass = *it;
 		SRoadClass* roadClass = prepareRoadClass( baseRoadClass );
 		d_roadClasses.push_back( roadClass );
 	}
 }
 
-SRoadClass* KContentsGenerator::prepareRoadClass( 
+SRoadClass* KContentsGenerator::prepareRoadClass(
 	const SRoadClass* baseRoadClass ) const
 {
-	SRoadClass* roadClass = 0;
-	if ( baseRoadClass != 0 )
+	SRoadClass* roadClass = nullptr;
+	if ( baseRoadClass != nullptr )
 	{
-		const coord_t thickness 
+		const coord_t thickness
 			= prepareRoadClassThickness( baseRoadClass->d_thickness );
-		const coord_t outlineThickness 
+		const coord_t outlineThickness
 			= prepareRoadClassOutlineThickness( baseRoadClass->d_outlineThickness );
 		if ( 0 < outlineThickness )
 		{
-			roadClass = new SRoadClass( 
+			roadClass = new SRoadClass(
 				thickness,
 				baseRoadClass->d_color,
-				outlineThickness, 
+				outlineThickness,
 				baseRoadClass->d_outlineColor );
 		}
 		else
 		{
-			roadClass = new SRoadClass( 
+			roadClass = new SRoadClass(
 				thickness,
 				baseRoadClass->d_color );
 		}
@@ -1469,7 +1466,7 @@ SRoadClass* KContentsGenerator::prepareRoadClass(
 	return roadClass;
 }
 
-coord_t KContentsGenerator::prepareRoadClassThickness( const coord_t defaultThickness ) const
+coord_t KContentsGenerator::prepareRoadClassThickness( coord_t defaultThickness ) const
 {
 	assert( 0 < defaultThickness );
 	coord_t thickness = defaultThickness;
@@ -1490,7 +1487,7 @@ coord_t KContentsGenerator::prepareRoadClassThickness( const coord_t defaultThic
 	return thickness;
 }
 
-coord_t KContentsGenerator::prepareRoadClassOutlineThickness( const coord_t defaultThickness ) const
+coord_t KContentsGenerator::prepareRoadClassOutlineThickness( coord_t defaultThickness ) const
 {
 	coord_t thickness = defaultThickness;
 	if ( defaultThickness != 0 )
@@ -1523,9 +1520,9 @@ bool KContentsGenerator::run( SContentsGeneratorData* generatorData )
 		result = drawSections< zoom_out >( generatorData );
 	else if ( d_zoomFactor < 0 )
 		result = drawSections< zoom_in >( generatorData );
-	else 
+	else
 		result = drawSections< no_zoom >( generatorData );
-		
+
 	if ( result )
 	{
 		IBitmap* bitmap = generatorData->d_bitmap;
@@ -1546,11 +1543,8 @@ bool KContentsGenerator::drawSections( SContentsGeneratorData* generatorData )
 
 	const IInternalDocument& document = generatorData->d_document;
 	const section_ids_t& sectionids = generatorData->d_sections;
-	for ( section_ids_cit it = sectionids.begin()
-		; it != sectionids.end()
-		; ++it )
+	for ( const section_id_t sectid : sectionids )
 	{
-		const section_id_t sectid = *it;
 		document.getSection( sectid, &d_section );
 		if ( filterSection( d_section ) )
 		{
@@ -1638,7 +1632,7 @@ bool KContentsGenerator::postZoomStep()
 		result = true;
 		if ( updateSectionOrientation() )
 		{
-			// inclined section may be clipped to straight horizontal 
+			// inclined section may be clipped to straight horizontal
 			// or vertical line, in such case clip is needed once again
 			if ( ( d_orientation == Horizontal ) || ( d_orientation == Vertical ) )
 			{
@@ -1675,7 +1669,7 @@ void KContentsGenerator::setRoadClass()
 	const std::size_t roadClassIndex = d_section.d_roadClassIndex;
 	assert( roadClassIndex < d_roadClasses.size() );
 	d_roadClass = d_roadClasses[ roadClassIndex ];
-	assert( d_roadClass != 0 );
+	assert( d_roadClass != nullptr );
 }
 
 void KContentsGenerator::setSectionOrientation()
@@ -1755,15 +1749,15 @@ coord_t KContentsGenerator::calcClipTolerance() const
 	return result;
 }
 
-void KContentsGenerator::prepareScreenPoint( 
-	const SPoint& viewportTopLeftCorner, 
+void KContentsGenerator::prepareScreenPoint(
+	const SPoint& viewportTopLeftCorner,
 	SPoint* point ) const
 {
 	point->x -= viewportTopLeftCorner.x;
 	point->y -= viewportTopLeftCorner.y;
 }
 
-bool KContentsGenerator::clipSection( 
+bool KContentsGenerator::clipSection(
 	const SRect& clipRect,
 	const int clipExtraTolerance )
 {

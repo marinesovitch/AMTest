@@ -5,8 +5,4 @@
 namespace be
 {
 
-IController::~IController()
-{
-}
-
 } // namespace be

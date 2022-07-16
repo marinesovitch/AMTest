@@ -23,30 +23,30 @@ class KDocument :
 	public KSegmentsManager
 {
 	public:
-		KDocument( IMapStream* mapStream );
-		virtual ~KDocument();
+		explicit KDocument( IMapStream* mapStream );
+		~KDocument() override = default;
 
 	public:
 		// IDocument
-		virtual std::string getState() const;
-		virtual void setState( const std::string& stateString );
+		std::string getState() const override;
+		void setState( const std::string& stateString ) override;
 
-		virtual color32_t getBkColor() const;
+		color32_t getBkColor() const override;
 
 	public:
 		// IInternalDocument
-		virtual const SViewData& getViewData() const;
-		virtual bool setViewData( const SViewData& viewData );
+		const SViewData& getViewData() const override;
+		bool setViewData( const SViewData& viewData ) override;
 
-		virtual const road_classes_t& getBaseRoadClasses() const;
+		const road_classes_t& getBaseRoadClasses() const override;
 
-		virtual bool selectSections(
-			const SRect& area,
-			section_ids_t* sections ) const;
+		bool selectSections(
+			const SRect& viewportRect,
+			section_ids_t* sections ) const override;
 
-		virtual void getSection(
-			const section_id_t sectid,
-			SSection* section ) const;
+		void getSection(
+			section_id_t sectid,
+			SSection* section ) const override;
 
 	private:
 		void initRoadClasses( const bools_t& roadClassFlags );
@@ -83,10 +83,6 @@ KDocument::KDocument( IMapStream* mapStream )
 		createIntervalTree();
 		initViewport();
 	}
-}
-
-KDocument::~KDocument()
-{
 }
 
 // ----------------------------------------------------------------------------
@@ -154,10 +150,10 @@ bool KDocument::selectSections(
 {
 	const KViewportArea viewportArea( viewportRect );
 	point_ids_t pointids;
-	if ( d_rangeTree.get() )
+	if ( d_rangeTree )
 		d_rangeTree->selectPoints( viewportArea, &pointids );
 	sect_pos_ids_t sectposids;
-	if ( d_intervalTree.get() )
+	if ( d_intervalTree )
 		d_intervalTree->selectSectPositions( viewportArea, &sectposids );
 	const bool result = prepareSections( viewportRect, pointids, sectposids, sections );
 	assert( compareBruteForceSelectSections( viewportRect, *sections ) );
@@ -179,11 +175,11 @@ void KDocument::initRoadClasses( const bools_t& roadClassFlags )
 	int roadClassIndex = 0;
 	const int lastRoadClassIndex = static_cast<int>(roadClassFlags.size() - 1);
 	assert( lastRoadClassIndex <= consts::MaxRoadClassIndex );
-	for ( bools_cit it = roadClassFlags.begin()
+	for ( auto it = roadClassFlags.begin()
 		; it != roadClassFlags.end()
 		; ++it, ++roadClassIndex )
 	{
-		SRoadClass* roadClass = 0;
+		SRoadClass* roadClass = nullptr;
 
 		const bool isRoadClass = *it;
 		if ( isRoadClass )
@@ -219,12 +215,12 @@ void KDocument::initViewport()
 
 void KDocument::createRangeTree()
 {
-	d_rangeTree.reset( new KRangeTree( *this ) );
+	d_rangeTree = std::make_unique<KRangeTree>( *this );
 }
 
 void KDocument::createIntervalTree()
 {
-	d_intervalTree.reset( new KIntervalTree( *this ) );
+	d_intervalTree = std::make_unique<KIntervalTree>( *this );
 }
 
 } // anonymous namespace
@@ -234,8 +230,7 @@ void KDocument::createIntervalTree()
 
 IInternalDocument* createDocument( IMapStream* mapStream )
 {
-	KDocument* document = new KDocument( mapStream );
-	return document;
+	return new KDocument( mapStream );
 }
 
 } // namespace be

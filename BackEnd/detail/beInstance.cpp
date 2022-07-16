@@ -10,8 +10,8 @@ namespace be
 {
 
 SInstance::SInstance()
-	: d_document( 0 )
-	, d_controller( 0 )
+	: d_document(nullptr )
+	, d_controller( nullptr )
 {
 }
 
@@ -24,13 +24,13 @@ SInstance::~SInstance()
 bool SInstance::init( IMapStream* mapStream )
 {
 	bool result = false;
-	if ( mapStream != 0 )
+	if ( mapStream != nullptr )
 	{
 		std::unique_ptr< IInternalDocument > internalDocument( createDocument( mapStream ) );
-		if ( internalDocument.get() != 0 )
+		if ( internalDocument )
 		{
 			d_controller = createController( internalDocument.get() );
-			if ( d_controller != 0 )
+			if ( d_controller )
 			{
 				d_document = internalDocument.release();
 				result = true;

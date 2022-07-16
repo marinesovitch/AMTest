@@ -10,7 +10,7 @@ namespace be
 struct IDocument
 {
 	public:
-		virtual ~IDocument();
+		virtual ~IDocument() = default;
 
 	public:
 		virtual std::string getState() const = 0;

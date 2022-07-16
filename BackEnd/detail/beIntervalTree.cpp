@@ -20,27 +20,27 @@ struct SHeapLeaf;
 class KHeapItemVisitor
 {
 	protected:
-		KHeapItemVisitor();
+		KHeapItemVisitor() = default;
 
 	public:
-		virtual ~KHeapItemVisitor();
+		virtual ~KHeapItemVisitor() = default;
 
 	public:
 		virtual void visitNode( SHeapNode* node );
 		virtual void visitLeaf( SHeapLeaf* leaf );
 		virtual void visitDefault( SHeapItem* item );
 
-};		
+};
 
 // ----------------------------------------------------------------------------
 
 struct SHeapItem
 {
 	protected:
-		SHeapItem( const SSectionPos* sectpos );
+		explicit SHeapItem( const SSectionPos* sectpos );
 
 	public:
-		virtual ~SHeapItem();
+		virtual ~SHeapItem() = default;
 
 	public:
 		virtual SHeapItem* getLeftChild() = 0;
@@ -58,26 +58,22 @@ SHeapItem::SHeapItem( const SSectionPos* sectpos )
 {
 }
 
-SHeapItem::~SHeapItem()
-{
-}
-
 // ----------------------------------------------------------------------------
 
 struct SHeapNode : public SHeapItem
 {
 	public:
-		SHeapNode( 
+		SHeapNode(
 			const SSectionPos* sectpos,
 			const SSectionPos* median );
-		virtual ~SHeapNode();
+		~SHeapNode() override;
 
 	public:
-		virtual SHeapItem* getLeftChild();
-		virtual SHeapItem* getRightChild();
-		virtual const SSectionPos* getMedian();
+		SHeapItem* getLeftChild() override;
+		SHeapItem* getRightChild() override;
+		const SSectionPos* getMedian() override;
 
-		virtual void accept( KHeapItemVisitor* visitor );
+		void accept( KHeapItemVisitor* visitor ) override;
 
 	public:
 		const SSectionPos* d_median;
@@ -86,13 +82,13 @@ struct SHeapNode : public SHeapItem
 
 };
 
-SHeapNode::SHeapNode( 
+SHeapNode::SHeapNode(
 	const SSectionPos* sectpos,
 	const SSectionPos* median )
 	: SHeapItem( sectpos )
 	, d_median( median )
-	, d_leftChild( 0 )
-	, d_rightChild( 0 )
+	, d_leftChild( nullptr )
+	, d_rightChild( nullptr )
 {
 }
 
@@ -127,14 +123,14 @@ void SHeapNode::accept( KHeapItemVisitor* visitor )
 struct SHeapLeaf : public SHeapItem
 {
 	public:
-		SHeapLeaf( const SSectionPos* sectpos );
+		explicit SHeapLeaf( const SSectionPos* sectpos );
 
 	public:
-		virtual SHeapItem* getLeftChild();
-		virtual SHeapItem* getRightChild();
-		virtual const SSectionPos* getMedian();
+		SHeapItem* getLeftChild() override;
+		SHeapItem* getRightChild() override;
+		const SSectionPos* getMedian() override;
 
-		virtual void accept( KHeapItemVisitor* visitor );
+		void accept( KHeapItemVisitor* visitor ) override;
 
 };
 
@@ -145,17 +141,17 @@ SHeapLeaf::SHeapLeaf( const SSectionPos* sectpos )
 
 SHeapItem* SHeapLeaf::getLeftChild()
 {
-	return 0;
+	return nullptr;
 }
 
 SHeapItem* SHeapLeaf::getRightChild()
 {
-	return 0;
+	return nullptr;
 }
 
 const SSectionPos* SHeapLeaf::getMedian()
 {
-	return 0;
+	return nullptr;
 }
 
 void SHeapLeaf::accept( KHeapItemVisitor* visitor )
@@ -164,14 +160,6 @@ void SHeapLeaf::accept( KHeapItemVisitor* visitor )
 }
 
 // ----------------------------------------------------------------------------
-
-KHeapItemVisitor::KHeapItemVisitor()
-{
-}
-
-KHeapItemVisitor::~KHeapItemVisitor()
-{
-}
 
 void KHeapItemVisitor::visitNode( SHeapNode* node )
 {
@@ -194,12 +182,12 @@ void KHeapItemVisitor::visitDefault( SHeapItem* /*item*/ )
 template< typename compare_by_1st_dim >
 struct find_min_element
 {
-	section_positions_it operator()( 
+	section_positions_it operator()(
 		section_positions_it begin,
 		section_positions_it end )
 	{
-		section_positions_it result 
-			= std::min_element( 
+		auto result
+			= std::min_element(
 				begin
 				, end
 				, compare_by_1st_dim() );
@@ -211,12 +199,12 @@ struct find_min_element
 template< typename compare_by_1st_dim >
 struct find_max_element
 {
-	section_positions_it operator()( 
+	section_positions_it operator()(
 		section_positions_it begin,
 		section_positions_it end )
 	{
-		section_positions_it result 
-			= std::max_element( 
+		auto result
+			= std::max_element(
 				begin
 				, end
 				, compare_by_1st_dim() );
@@ -231,7 +219,7 @@ struct find_max_element
 template< typename comparator, typename position_t >
 struct is_in_left_top_side_range
 {
-	is_in_left_top_side_range( const position_t& position )
+	explicit is_in_left_top_side_range( const position_t& position )
 		: d_position( position )
 	{
 	}
@@ -250,7 +238,7 @@ struct is_in_left_top_side_range
 template< typename comparator, typename position_t >
 struct is_in_right_bottom_side_range
 {
-	is_in_right_bottom_side_range( const position_t& position )
+	explicit is_in_right_bottom_side_range( const position_t& position )
 		: d_position( position )
 	{
 	}
@@ -268,21 +256,21 @@ struct is_in_right_bottom_side_range
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-typedef std::set< const SSectionPos* > sectpos_set_t;
-typedef sectpos_set_t::iterator sectpos_set_it;
+using sectpos_set_t = std::set< const SSectionPos* >;
+using sectpos_set_it = sectpos_set_t::iterator;
 
-template< 
-	typename is_in_1st_dim_range_t, 
+template<
+	typename is_in_1st_dim_range_t,
 	typename compare_by_2nd_dim_t >
 struct SCheckHeapConsistencyTraits
 {
-	typedef is_in_1st_dim_range_t is_in_1st_dim_range;
-	typedef compare_by_2nd_dim_t compare_by_2nd_dim;
+	using is_in_1st_dim_range = is_in_1st_dim_range_t;
+	using compare_by_2nd_dim = compare_by_2nd_dim_t;
 };
 
 struct SCheckResult
 {
-	SCheckResult( const section_positions_t& sect_positions )
+	explicit SCheckResult( const section_positions_t& sect_positions )
 		: d_consistent( true )
 		, d_sectpos_set( sect_positions.begin(), sect_positions.end() )
 	{
@@ -296,9 +284,9 @@ template< typename traits >
 class KCheckHeapConsistency : public KHeapItemVisitor
 {
 	public:
-		KCheckHeapConsistency( 
-			const SHeapNode* parent, 
-			const EChildSide childSide,
+		KCheckHeapConsistency(
+			const SHeapNode* parent,
+			EChildSide childSide,
 			SCheckResult* result );
 
 	public:
@@ -307,8 +295,8 @@ class KCheckHeapConsistency : public KHeapItemVisitor
 			const section_positions_t& sect_positions );
 
 	public:
-		virtual void visitNode( SHeapNode* node );
-		virtual void visitDefault( SHeapItem* item );
+		void visitNode( SHeapNode* node ) override;
+		void visitDefault( SHeapItem* item ) override;
 
 	private:
 		void checkPosAgainstParent( SHeapItem* item );
@@ -325,9 +313,9 @@ class KCheckHeapConsistency : public KHeapItemVisitor
 // ----------------------------------------------------------------------------
 
 template< typename traits >
-KCheckHeapConsistency< traits >::KCheckHeapConsistency( 
+KCheckHeapConsistency< traits >::KCheckHeapConsistency(
 	const SHeapNode* parent,
-	const EChildSide childSide,
+	EChildSide childSide,
 	SCheckResult* result )
 	: d_parent( parent )
 	, d_childSide( childSide )
@@ -336,16 +324,16 @@ KCheckHeapConsistency< traits >::KCheckHeapConsistency(
 }
 
 template< typename traits >
-bool KCheckHeapConsistency< traits >::run( 
+bool KCheckHeapConsistency< traits >::run(
 	SHeapItem* heapRoot,
 	const section_positions_t& sect_positions )
 {
 	bool result = true;
 	#ifdef ENABLE_TREE_CHECKERS
-	if ( heapRoot != 0 )
+	if ( heapRoot != nullptr )
 	{
 		SCheckResult checkResult( sect_positions );
-		KCheckHeapConsistency< traits > checkConsistency( 0, NoParent, &checkResult );
+		KCheckHeapConsistency< traits > checkConsistency( nullptr, NoParent, &checkResult );
 		heapRoot->accept( &checkConsistency );
 		result = checkResult.d_consistent && checkResult.d_sectpos_set.empty();
 		assert( result ); // stopping assertion
@@ -360,14 +348,14 @@ void KCheckHeapConsistency< traits >::visitNode( SHeapNode* node )
 	visitDefault( node );
 
 	SHeapItem* leftChild = node->getLeftChild();
-	if ( leftChild != 0 )
+	if ( leftChild )
 	{
 		KCheckHeapConsistency< traits > checkConsistency( node, LeftChild, d_result );
 		leftChild->accept( &checkConsistency );
 	}
 
 	SHeapItem* rightChild = node->getRightChild();
-	if ( rightChild != 0 )
+	if ( rightChild )
 	{
 		KCheckHeapConsistency< traits > checkConsistency( node, RightChild, d_result );
 		rightChild->accept( &checkConsistency );
@@ -384,14 +372,14 @@ void KCheckHeapConsistency< traits >::visitDefault( SHeapItem* item )
 template< typename traits >
 void KCheckHeapConsistency< traits >::checkPosAgainstParent( SHeapItem* item )
 {
-	if ( d_parent != 0 )
+	if ( d_parent )
 	{
 		bool consistent = true;
-		const SSectionPos* parentPos = d_parent->d_sectpos; 
+		const SSectionPos* parentPos = d_parent->d_sectpos;
 		if ( typename traits::is_in_1st_dim_range( parentPos )( item ) )
 		{
 			const SSectionPos* median = d_parent->d_median;
-			const SSectionPos* itemPos = item->d_sectpos; 
+			const SSectionPos* itemPos = item->d_sectpos;
 			if ( d_childSide == LeftChild )
 			{
 				if ( ! typename traits::compare_by_2nd_dim()( itemPos, median ) && ( itemPos != median ) )
@@ -422,7 +410,7 @@ void KCheckHeapConsistency< traits >::updatePointPosSet( SHeapItem* item )
 {
 	sectpos_set_t& sectpos_set = d_result->d_sectpos_set;
 	const SSectionPos* sectPos = item->d_sectpos;
-	sectpos_set_it it = d_result->d_sectpos_set.find( sectPos );
+	auto it = d_result->d_sectpos_set.find( sectPos );
 	assert( it != sectpos_set.end() );
 	sectpos_set.erase( it );
 }
@@ -430,20 +418,20 @@ void KCheckHeapConsistency< traits >::updatePointPosSet( SHeapItem* item )
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-template< 
+template<
 	typename find_subtree_root_t,
 	typename compare_by_2nd_dim_t >
 struct SHeapBuilderTraits
 {
-	typedef find_subtree_root_t find_subtree_root;
-	typedef compare_by_2nd_dim_t compare_by_2nd_dim; 
+	using find_subtree_root = find_subtree_root_t;
+	using compare_by_2nd_dim = compare_by_2nd_dim_t;
 };
 
 template< typename traits >
 class KHeapBuilder
 {
 	public:
-		KHeapBuilder();
+		KHeapBuilder() = default;
 
 	public:
 		SHeapItem* run(
@@ -459,7 +447,7 @@ class KHeapBuilder
 			section_positions_it begin,
 			section_positions_it end );
 
-		SHeapItem* createLeaf( 
+		SHeapItem* createLeaf(
 			const SSectionPos* sectpos );
 
 	private:
@@ -475,12 +463,7 @@ class KHeapBuilder
 // ----------------------------------------------------------------------------
 
 template< typename traits >
-KHeapBuilder< traits >::KHeapBuilder()
-{
-}
-
-template< typename traits >
-SHeapItem* KHeapBuilder< traits >::run( 
+SHeapItem* KHeapBuilder< traits >::run(
 	section_positions_it begin,
 	section_positions_it end )
 {
@@ -498,7 +481,7 @@ SHeapItem* KHeapBuilder< traits >::createItem(
 	section_positions_it begin,
 	section_positions_it end )
 {
-	SHeapItem* result = 0;
+	SHeapItem* result = nullptr;
 	const std::size_t sectPosCount = std::distance( begin, end );
 	if ( 1 < sectPosCount )
 	{
@@ -517,9 +500,9 @@ SHeapItem* KHeapBuilder< traits >::createNode(
 	section_positions_it raw_begin,
 	section_positions_it raw_end )
 {
-	// find sectpos according to 1st dim (minimal coord for left/top side or 
+	// find sectpos according to 1st dim (minimal coord for left/top side or
 	// maximal for right/bottom), it will be hold in this subtree root
-	section_positions_it it_subtree_root 
+	auto it_subtree_root
 		= typename traits::find_subtree_root()( raw_begin, raw_end );
 	const SSectionPos* subtreeRootSectPos = *it_subtree_root;
 	section_positions_it begin;
@@ -528,15 +511,15 @@ SHeapItem* KHeapBuilder< traits >::createNode(
 
 	assert( utils::is_sorted( begin, end, typename traits::compare_by_2nd_dim() ) );
 
-	section_positions_it median_it = utils::get_median( begin, end );
+	auto median_it = utils::get_median( begin, end );
 	const SSectionPos* medianSectPos = *median_it;
 
-	SHeapNode* node = new SHeapNode( subtreeRootSectPos, medianSectPos );
+	auto node = new SHeapNode( subtreeRootSectPos, medianSectPos );
 
-	section_positions_it lend = median_it + 1;
+	auto lend = median_it + 1;
 	node->d_leftChild = createItem( begin, lend );
 
-	section_positions_it rbegin = lend;
+	auto rbegin = lend;
 	node->d_rightChild = createItem( rbegin, end );
 
 	return node;
@@ -545,8 +528,7 @@ SHeapItem* KHeapBuilder< traits >::createNode(
 template< typename traits >
 SHeapItem* KHeapBuilder< traits >::createLeaf( const SSectionPos* sectpos )
 {
-	SHeapLeaf* result = new SHeapLeaf( sectpos );
-	return result;
+	return new SHeapLeaf( sectpos );
 }
 
 // ----------------------------------------------------------------------------
@@ -559,8 +541,8 @@ void KHeapBuilder< traits >::prepareSubtreeChildrenRange(
 	section_positions_it* begin,
 	section_positions_it* end )
 {
-	// sectpos at it_subtree_root is already stored and needless, we need continuous 
-	// range of subtree range, so move other sect_positions to overwrite it and make 
+	// sectpos at it_subtree_root is already stored and needless, we need continuous
+	// range of subtree range, so move other sect_positions to overwrite it and make
 	// continuous range <begin,end)
 	const std::size_t diff_from_begin = std::distance( raw_begin, it_subtree_root );
 	const std::size_t diff_to_end = std::distance( it_subtree_root, raw_end - 1 );
@@ -590,27 +572,27 @@ struct SIntervalTreeLeaf;
 class KIntervalTreeItemVisitor
 {
 	protected:
-		KIntervalTreeItemVisitor();
+		KIntervalTreeItemVisitor() = default;
 
 	public:
-		virtual ~KIntervalTreeItemVisitor();
+		virtual ~KIntervalTreeItemVisitor() = default;
 
 	public:
 		virtual void visitNode( SIntervalTreeNode* node );
 		virtual void visitLeaf( SIntervalTreeLeaf* leaf );
 		virtual void visitDefault( SIntervalTreeItem* item );
 
-};		
+};
 
 // ----------------------------------------------------------------------------
 
 struct SIntervalTreeItem
 {
 	protected:
-		SIntervalTreeItem();
+		SIntervalTreeItem() = default;
 
 	public:
-		virtual ~SIntervalTreeItem();
+		virtual ~SIntervalTreeItem() = default;
 
 	public:
 		virtual SIntervalTreeItem* getLeftChild() = 0;
@@ -620,27 +602,19 @@ struct SIntervalTreeItem
 
 };
 
-SIntervalTreeItem::SIntervalTreeItem()
-{
-}
-
-SIntervalTreeItem::~SIntervalTreeItem()
-{
-}
-
 // ----------------------------------------------------------------------------
 
 struct SIntervalTreeNode : public SIntervalTreeItem
 {
 	public:
-		SIntervalTreeNode( const SSectionPos* medSectPos );
-		virtual ~SIntervalTreeNode();
+		explicit SIntervalTreeNode( const SSectionPos* medSectPos );
+		~SIntervalTreeNode() override;
 
 	public:
-		virtual SIntervalTreeItem* getLeftChild();
-		virtual SIntervalTreeItem* getRightChild();
+		SIntervalTreeItem* getLeftChild() override;
+		SIntervalTreeItem* getRightChild() override;
 
-		virtual void accept( KIntervalTreeItemVisitor* visitor );
+		void accept( KIntervalTreeItemVisitor* visitor ) override;
 
 	public:
 		const SSectionPos* d_medSectPos;
@@ -651,12 +625,12 @@ struct SIntervalTreeNode : public SIntervalTreeItem
 
 };
 
-SIntervalTreeNode::SIntervalTreeNode( const SSectionPos* medSectPos ) 
+SIntervalTreeNode::SIntervalTreeNode( const SSectionPos* medSectPos )
 	: d_medSectPos( medSectPos )
-	, d_medSectPositionsOnLeftTop( 0 )
-	, d_medSectPositionsOnRightBottom( 0 )
-	, d_leftChild( 0 )
-	, d_rightChild( 0 )
+	, d_medSectPositionsOnLeftTop(nullptr )
+	, d_medSectPositionsOnRightBottom( nullptr )
+	, d_leftChild( nullptr )
+	, d_rightChild( nullptr )
 {
 }
 
@@ -688,15 +662,15 @@ void SIntervalTreeNode::accept( KIntervalTreeItemVisitor* visitor )
 struct SIntervalTreeLeaf : public SIntervalTreeItem
 {
 	public:
-		SIntervalTreeLeaf( 
+		SIntervalTreeLeaf(
 			const SSectionPos* beginSectPos,
 			const SSectionPos* endSectPos );
 
 	public:
-		virtual SIntervalTreeItem* getLeftChild();
-		virtual SIntervalTreeItem* getRightChild();
+		SIntervalTreeItem* getLeftChild() override;
+		SIntervalTreeItem* getRightChild() override;
 
-		virtual void accept( KIntervalTreeItemVisitor* visitor );
+		void accept( KIntervalTreeItemVisitor* visitor ) override;
 
 	public:
 		const SSectionPos* d_beginSectPos;
@@ -704,9 +678,9 @@ struct SIntervalTreeLeaf : public SIntervalTreeItem
 
 };
 
-SIntervalTreeLeaf::SIntervalTreeLeaf( 
+SIntervalTreeLeaf::SIntervalTreeLeaf(
 	const SSectionPos* beginSectPos,
-	const SSectionPos* endSectPos ) 
+	const SSectionPos* endSectPos )
 	: d_beginSectPos( beginSectPos )
 	, d_endSectPos( endSectPos )
 {
@@ -715,12 +689,12 @@ SIntervalTreeLeaf::SIntervalTreeLeaf(
 
 SIntervalTreeItem* SIntervalTreeLeaf::getLeftChild()
 {
-	return 0;
+	return nullptr;
 }
 
 SIntervalTreeItem* SIntervalTreeLeaf::getRightChild()
 {
-	return 0;
+	return nullptr;
 }
 
 void SIntervalTreeLeaf::accept( KIntervalTreeItemVisitor* visitor )
@@ -729,14 +703,6 @@ void SIntervalTreeLeaf::accept( KIntervalTreeItemVisitor* visitor )
 }
 
 // ----------------------------------------------------------------------------
-
-KIntervalTreeItemVisitor::KIntervalTreeItemVisitor()
-{
-}
-
-KIntervalTreeItemVisitor::~KIntervalTreeItemVisitor()
-{
-}
 
 void KIntervalTreeItemVisitor::visitNode( SIntervalTreeNode* node )
 {
@@ -759,16 +725,16 @@ void KIntervalTreeItemVisitor::visitDefault( SIntervalTreeItem* /*item*/ )
 class KTraverseHeap : public KHeapItemVisitor
 {
 	public:
-		KTraverseHeap( sectpos_set_t* sectpos_set );
+		explicit KTraverseHeap( sectpos_set_t* sectpos_set );
 
 	public:
-		virtual void visitNode( SHeapNode* node );
-		virtual void visitDefault( SHeapItem* item );
+		void visitNode( SHeapNode* node ) override;
+		void visitDefault( SHeapItem* item ) override;
 
 	private:
 		sectpos_set_t* d_sectpos_set;
 
-};		
+};
 
 // ----------------------------------------------------------------------------
 
@@ -782,18 +748,18 @@ void KTraverseHeap::visitNode( SHeapNode* node )
 	visitDefault( node );
 
 	SHeapItem* leftChild = node->getLeftChild();
-	if ( leftChild != 0 )
+	if ( leftChild )
 		leftChild->accept( this );
 
 	SHeapItem* rightChild = node->getRightChild();
-	if ( rightChild != 0 )
+	if ( rightChild )
 		rightChild->accept( this );
 }
 
 void KTraverseHeap::visitDefault( SHeapItem* item )
 {
 	const SSectionPos* itemPos = item->d_sectpos;
-	sectpos_set_it it = d_sectpos_set->find( itemPos );
+	auto it = d_sectpos_set->find( itemPos );
 	assert( it != d_sectpos_set->end() );
 	d_sectpos_set->erase( it );
 }
@@ -801,22 +767,22 @@ void KTraverseHeap::visitDefault( SHeapItem* item )
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-typedef std::set< const SSectionPos* > sectpos_set_t;
-typedef sectpos_set_t::iterator sectpos_set_it;
+using sectpos_set_t = std::set< const SSectionPos* >;
+using sectpos_set_it = sectpos_set_t::iterator;
 
 template< typename compare_by_1st_dim_t >
 struct SCheckIntervalTreeConsistencyTraits
 {
-	typedef compare_by_1st_dim_t compare_by_1st_dim;
+	using compare_by_1st_dim = compare_by_1st_dim_t;
 };
 
 template< typename traits >
 class KCheckIntervalTreeConsistency : public KIntervalTreeItemVisitor
 {
 	public:
-		KCheckIntervalTreeConsistency( 
-			const SIntervalTreeNode* parent, 
-			const EChildSide childSide,
+		KCheckIntervalTreeConsistency(
+			const SIntervalTreeNode* parent,
+			EChildSide childSide,
 			SCheckResult* result );
 
 	public:
@@ -825,13 +791,13 @@ class KCheckIntervalTreeConsistency : public KIntervalTreeItemVisitor
 			const section_positions_t& sect_positions );
 
 	public:
-		virtual void visitNode( SIntervalTreeNode* node );
-		virtual void visitLeaf( SIntervalTreeLeaf* leaf );
+		void visitNode( SIntervalTreeNode* node ) override;
+		void visitLeaf( SIntervalTreeLeaf* leaf ) override;
 
 	private:
 		void checkPosAgainstParent( const SSectionPos* itemPos );
 		void checkNodeHeaps( SIntervalTreeNode* node );
-		void updatePointPosSet( const SSectionPos* itemPos );
+		void updatePointPosSet( const SSectionPos* sectPos );
 
 	private:
 		const SIntervalTreeNode* d_parent;
@@ -844,9 +810,9 @@ class KCheckIntervalTreeConsistency : public KIntervalTreeItemVisitor
 // ----------------------------------------------------------------------------
 
 template< typename traits >
-KCheckIntervalTreeConsistency< traits >::KCheckIntervalTreeConsistency( 
+KCheckIntervalTreeConsistency< traits >::KCheckIntervalTreeConsistency(
 	const SIntervalTreeNode* parent,
-	const EChildSide childSide,
+	EChildSide childSide,
 	SCheckResult* result )
 	: d_parent( parent )
 	, d_childSide( childSide )
@@ -855,16 +821,16 @@ KCheckIntervalTreeConsistency< traits >::KCheckIntervalTreeConsistency(
 }
 
 template< typename traits >
-bool KCheckIntervalTreeConsistency< traits >::run( 
+bool KCheckIntervalTreeConsistency< traits >::run(
 	SIntervalTreeItem* root,
 	const section_positions_t& sect_positions )
 {
 	bool result = true;
 	#ifdef ENABLE_TREE_CHECKERS
-	if ( root != 0 )
+	if ( root != nullptr )
 	{
 		SCheckResult checkResult( sect_positions );
-		KCheckIntervalTreeConsistency< traits > checkConsistency( 0, NoParent, &checkResult );
+		KCheckIntervalTreeConsistency< traits > checkConsistency( nullptr, NoParent, &checkResult );
 		root->accept( &checkConsistency );
 		result = checkResult.d_consistent && checkResult.d_sectpos_set.empty();
 		assert( result ); // stopping assertion
@@ -876,19 +842,19 @@ bool KCheckIntervalTreeConsistency< traits >::run(
 template< typename traits >
 void KCheckIntervalTreeConsistency< traits >::visitNode( SIntervalTreeNode* node )
 {
-	const SSectionPos* itemPos = node->d_medSectPos; 
+	const SSectionPos* itemPos = node->d_medSectPos;
 	checkPosAgainstParent( itemPos );
 	checkNodeHeaps( node );
 
 	SIntervalTreeItem* leftChild = node->getLeftChild();
-	if ( leftChild != 0 )
+	if ( leftChild )
 	{
 		KCheckIntervalTreeConsistency< traits > checkConsistency( node, LeftChild, d_result );
 		leftChild->accept( &checkConsistency );
 	}
 
 	SIntervalTreeItem* rightChild = node->getRightChild();
-	if ( rightChild != 0 )
+	if ( rightChild )
 	{
 		KCheckIntervalTreeConsistency< traits > checkConsistency( node, RightChild, d_result );
 		rightChild->accept( &checkConsistency );
@@ -898,11 +864,11 @@ void KCheckIntervalTreeConsistency< traits >::visitNode( SIntervalTreeNode* node
 template< typename traits >
 void KCheckIntervalTreeConsistency< traits >::visitLeaf( SIntervalTreeLeaf* leaf )
 {
-	const SSectionPos* beginSectPos = leaf->d_beginSectPos; 
+	const SSectionPos* beginSectPos = leaf->d_beginSectPos;
 	checkPosAgainstParent( beginSectPos );
 	updatePointPosSet( beginSectPos );
 
-	const SSectionPos* endSectPos = leaf->d_endSectPos; 
+	const SSectionPos* endSectPos = leaf->d_endSectPos;
 	checkPosAgainstParent( endSectPos );
 	updatePointPosSet( endSectPos );
 }
@@ -910,10 +876,10 @@ void KCheckIntervalTreeConsistency< traits >::visitLeaf( SIntervalTreeLeaf* leaf
 template< typename traits >
 void KCheckIntervalTreeConsistency< traits >::checkPosAgainstParent( const SSectionPos* itemPos )
 {
-	if ( d_parent != 0 )
+	if ( d_parent )
 	{
 		bool consistent = true;
-		const SSectionPos* parentPos = d_parent->d_medSectPos; 
+		const SSectionPos* parentPos = d_parent->d_medSectPos;
 		if ( d_childSide == LeftChild )
 		{
 			if ( ! typename traits::compare_by_1st_dim()( itemPos, parentPos ) )
@@ -940,11 +906,11 @@ void KCheckIntervalTreeConsistency< traits >::checkNodeHeaps( SIntervalTreeNode*
 	KTraverseHeap traverseHeap( &d_result->d_sectpos_set );
 
 	SHeapItem* medSectPositionsOnLeftTop = node->d_medSectPositionsOnLeftTop;
-	if ( medSectPositionsOnLeftTop != 0 )
+	if ( medSectPositionsOnLeftTop )
 		medSectPositionsOnLeftTop->accept( &traverseHeap );
 
 	SHeapItem* medSectPositionsOnRightBottom = node->d_medSectPositionsOnRightBottom;
-	if ( medSectPositionsOnRightBottom != 0 )
+	if ( medSectPositionsOnRightBottom )
 		medSectPositionsOnRightBottom->accept( &traverseHeap );
 }
 
@@ -952,7 +918,7 @@ template< typename traits >
 void KCheckIntervalTreeConsistency< traits >::updatePointPosSet( const SSectionPos* sectPos )
 {
 	sectpos_set_t& sectpos_set = d_result->d_sectpos_set;
-	sectpos_set_it it = d_result->d_sectpos_set.find( sectPos );
+	auto it = d_result->d_sectpos_set.find( sectPos );
 	assert( it != sectpos_set.end() );
 	sectpos_set.erase( it );
 }
@@ -960,13 +926,13 @@ void KCheckIntervalTreeConsistency< traits >::updatePointPosSet( const SSectionP
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-template< 
+template<
 	typename compare_by_1st_dim_t,
 	typename compare_by_2nd_dim_t >
 struct SIntervalTreeBuilderTraits
 {
-	typedef compare_by_1st_dim_t compare_by_1st_dim;
-	typedef compare_by_2nd_dim_t compare_by_2nd_dim;
+	using compare_by_1st_dim = compare_by_1st_dim_t;
+	using compare_by_2nd_dim = compare_by_2nd_dim_t;
 };
 
 
@@ -974,10 +940,10 @@ template< typename traits >
 class KIntervalTreeBuilder
 {
 	public:
-		KIntervalTreeBuilder( const KSegmentsManager& segmentsManager );
+		explicit KIntervalTreeBuilder( const KSegmentsManager& segmentsManager );
 
 	public:
-		SIntervalTreeItem* run( const section_positions_t& sect_positions_by_x );
+		SIntervalTreeItem* run( const section_positions_t& sect_positions_by_1st_dim );
 
 	private:
 		SIntervalTreeItem* createItem(
@@ -986,7 +952,7 @@ class KIntervalTreeBuilder
 		SIntervalTreeItem* createNode(
 			const section_positions_t& sect_positions_by_1st_dim );
 
-		SIntervalTreeItem* createLeaf( 
+		SIntervalTreeItem* createLeaf(
 			const SSectionPos* beginSectPos,
 			const SSectionPos* endSectPos );
 
@@ -997,7 +963,7 @@ class KIntervalTreeBuilder
 			const SSectionPos* medianSectPos,
 			section_positions_t* medSectPositionsOnLeftTop,
 			section_positions_t* sectPositionsOutOnLeftTop ) const;
-		SHeapItem* createHeapMedSectPositionsOnLeftTop( 
+		SHeapItem* createHeapMedSectPositionsOnLeftTop(
 			section_positions_t* medSectPositionsOnLeftTop ) const;
 
 		void prepareNodeRightSide(
@@ -1006,7 +972,7 @@ class KIntervalTreeBuilder
 			const SSectionPos* medianSectPos,
 			section_positions_t* medSectPositionsOnRightBottom,
 			section_positions_t* sectPositionsOutOnRightBottom ) const;
-		SHeapItem* createHeapMedSectPositionsOnRightBottom( 
+		SHeapItem* createHeapMedSectPositionsOnRightBottom(
 			section_positions_t* medSectPositionsOnRightBottom ) const;
 
 	private:
@@ -1032,10 +998,10 @@ SIntervalTreeItem* KIntervalTreeBuilder< traits >::run( const section_positions_
 // ----------------------------------------------------------------------------
 
 template< typename traits >
-SIntervalTreeItem* KIntervalTreeBuilder< traits >::createItem( 
+SIntervalTreeItem* KIntervalTreeBuilder< traits >::createItem(
 	const section_positions_t& sect_positions_by_1st_dim )
 {
-	SIntervalTreeItem* result = 0;
+	SIntervalTreeItem* result = nullptr;
 	const std::size_t sectPosCount = sect_positions_by_1st_dim.size();
 	if ( 2 < sectPosCount )
 	{
@@ -1057,16 +1023,16 @@ SIntervalTreeItem* KIntervalTreeBuilder< traits >::createItem(
 template< typename traits >
 SIntervalTreeItem* KIntervalTreeBuilder< traits >::createNode( const section_positions_t& sect_positions_by_1st_dim )
 {
-	section_positions_cit begin = sect_positions_by_1st_dim.begin();
-	section_positions_cit end = sect_positions_by_1st_dim.end();
-	section_positions_cit median_node_it = utils::get_median( begin, end );
+	auto begin = sect_positions_by_1st_dim.begin();
+	auto end = sect_positions_by_1st_dim.end();
+	auto median_node_it = utils::get_median( begin, end );
 	assert( median_node_it != sect_positions_by_1st_dim.end() );
 
 	const SSectionPos* medianSectPos = *median_node_it;
-	SIntervalTreeNode* node = new SIntervalTreeNode( medianSectPos );
+	auto node = new SIntervalTreeNode( medianSectPos );
 
-	section_positions_cit lbegin = begin;
-	section_positions_cit lend = median_node_it;
+	auto lbegin = begin;
+	auto lend = median_node_it;
 	section_positions_t medSectPositionsOnLeftTop( 1, medianSectPos );
 	section_positions_t sectPositionsOutOnLeftTop;
 	prepareNodeLeftSide(
@@ -1095,12 +1061,11 @@ SIntervalTreeItem* KIntervalTreeBuilder< traits >::createNode( const section_pos
 }
 
 template< typename traits >
-SIntervalTreeItem* KIntervalTreeBuilder< traits >::createLeaf( 
+SIntervalTreeItem* KIntervalTreeBuilder< traits >::createLeaf(
 	const SSectionPos* beginSectPos,
 	const SSectionPos* endSectPos )
 {
-	SIntervalTreeLeaf* result = new SIntervalTreeLeaf( beginSectPos, endSectPos );
-	return result;
+	return new SIntervalTreeLeaf( beginSectPos, endSectPos );
 }
 
 // ----------------------------------------------------------------------------
@@ -1113,7 +1078,7 @@ void KIntervalTreeBuilder< traits >::prepareNodeLeftSide(
 	section_positions_t* medSectPositionsOnLeftTop,
 	section_positions_t* sectPositionsOutOnLeftTop ) const
 {
-	for ( section_positions_cit it = begin 
+	for ( auto it = begin
 		; it != end
 		; ++it )
 	{
@@ -1127,7 +1092,7 @@ void KIntervalTreeBuilder< traits >::prepareNodeLeftSide(
 }
 
 template< typename traits >
-SHeapItem* KIntervalTreeBuilder< traits >::createHeapMedSectPositionsOnLeftTop( 
+SHeapItem* KIntervalTreeBuilder< traits >::createHeapMedSectPositionsOnLeftTop(
 	section_positions_t* medSectPositionsOnLeftTop ) const
 {
 	#ifndef NDEBUG
@@ -1136,21 +1101,21 @@ SHeapItem* KIntervalTreeBuilder< traits >::createHeapMedSectPositionsOnLeftTop(
 	const section_positions_t medSectPositionsOnLeftTopCopy( *medSectPositionsOnLeftTop );
 	#endif
 
-	typedef SHeapBuilderTraits< 
+	using builder_traits_t = SHeapBuilderTraits<
 		find_min_element< typename traits::compare_by_1st_dim >
 		, typename traits::compare_by_2nd_dim
-		> builder_traits_t;
+		>;
 	KHeapBuilder< builder_traits_t > heapBuilder;
 	section_positions_it begin = medSectPositionsOnLeftTop->begin();
 	section_positions_it end = medSectPositionsOnLeftTop->end();
 	SHeapItem* heapRoot = heapBuilder.run( begin, end );
 
-	typedef is_in_right_bottom_side_range< 
-		typename traits::compare_by_1st_dim, 
-		const SSectionPos* > is_behind_parent_t;
-	typedef SCheckHeapConsistencyTraits< 
-		is_behind_parent_t, 
-		typename traits::compare_by_2nd_dim > checker_traits_t;
+	using is_behind_parent_t = is_in_right_bottom_side_range<
+		typename traits::compare_by_1st_dim,
+		const SSectionPos* >;
+	using checker_traits_t = SCheckHeapConsistencyTraits<
+		is_behind_parent_t,
+		typename traits::compare_by_2nd_dim >;
 	assert( KCheckHeapConsistency< checker_traits_t >::run( heapRoot, medSectPositionsOnLeftTopCopy ) );
 
 	return heapRoot;
@@ -1164,7 +1129,7 @@ void KIntervalTreeBuilder< traits >::prepareNodeRightSide(
 	section_positions_t* medSectPositionsOnRightBottom,
 	section_positions_t* sectPositionsOutOnRightBottom ) const
 {
-	for ( section_positions_cit it = begin 
+	for ( section_positions_cit it = begin
 		; it != end
 		; ++it )
 	{
@@ -1178,7 +1143,7 @@ void KIntervalTreeBuilder< traits >::prepareNodeRightSide(
 }
 
 template< typename traits >
-SHeapItem* KIntervalTreeBuilder< traits >::createHeapMedSectPositionsOnRightBottom( 
+SHeapItem* KIntervalTreeBuilder< traits >::createHeapMedSectPositionsOnRightBottom(
 	section_positions_t* medSectPositionsOnRightBottom ) const
 {
 	#ifndef NDEBUG
@@ -1187,21 +1152,21 @@ SHeapItem* KIntervalTreeBuilder< traits >::createHeapMedSectPositionsOnRightBott
 	const section_positions_t medSectPositionsOnRightBottomCopy( *medSectPositionsOnRightBottom );
 	#endif
 
-	typedef SHeapBuilderTraits< 
+	using builder_traits_t = SHeapBuilderTraits<
 		find_max_element< typename traits::compare_by_1st_dim >
 		, typename traits::compare_by_2nd_dim
-		> builder_traits_t;
+		>;
 	KHeapBuilder< builder_traits_t > heapBuilder;
 	section_positions_it begin = medSectPositionsOnRightBottom->begin();
 	section_positions_it end = medSectPositionsOnRightBottom->end();
 	SHeapItem* heapRoot = heapBuilder.run( begin, end );
 
-	typedef is_in_left_top_side_range< 
-		typename traits::compare_by_1st_dim, 
-		const SSectionPos* > is_in_front_of_parent_t;
-	typedef SCheckHeapConsistencyTraits< 
-		is_in_front_of_parent_t, 
-		typename traits::compare_by_2nd_dim > checker_traits_t;
+	using is_in_front_of_parent_t = is_in_left_top_side_range<
+		typename traits::compare_by_1st_dim,
+		const SSectionPos* >;
+	using checker_traits_t = SCheckHeapConsistencyTraits<
+		is_in_front_of_parent_t,
+		typename traits::compare_by_2nd_dim >;
 	assert( KCheckHeapConsistency< checker_traits_t >::run( heapRoot, medSectPositionsOnRightBottomCopy ) );
 
 	return heapRoot;
@@ -1210,20 +1175,20 @@ SHeapItem* KIntervalTreeBuilder< traits >::createHeapMedSectPositionsOnRightBott
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-template< 
-	typename is_in_1st_dim_range_t, 
+template<
+	typename is_in_1st_dim_range_t,
 	typename compare_by_2nd_dim_t >
 struct SFindSplitNodeTraits
 {
-	typedef is_in_1st_dim_range_t is_in_1st_dim_range;
-	typedef compare_by_2nd_dim_t compare_by_2nd_dim;
+	using is_in_1st_dim_range = is_in_1st_dim_range_t;
+	using compare_by_2nd_dim = compare_by_2nd_dim_t;
 };
 
 template< typename traits >
 class KFindSplitNode : public KHeapItemVisitor
 {
 	public:
-		KFindSplitNode( 
+		KFindSplitNode(
 			const KViewportArea& viewportArea,
 			const SViewportBorder& axis,
 			const SViewportBorder& min2ndDimEdge,
@@ -1233,8 +1198,8 @@ class KFindSplitNode : public KHeapItemVisitor
 		SHeapItem* getResult();
 
 	public:
-		virtual void visitNode( SHeapNode* node );
-		virtual void visitLeaf( SHeapLeaf* leaf );
+		void visitNode( SHeapNode* node ) override;
+		void visitLeaf( SHeapLeaf* leaf ) override;
 
 	private:
 		bool isIn1stDimRange( const SHeapItem* item ) const;
@@ -1249,12 +1214,12 @@ class KFindSplitNode : public KHeapItemVisitor
 		sect_pos_ids_t& d_sectposids;
 		SHeapItem* d_result;
 
-};		
+};
 
 // ----------------------------------------------------------------------------
 
 template< typename traits >
-KFindSplitNode< traits >::KFindSplitNode( 
+KFindSplitNode< traits >::KFindSplitNode(
 	const KViewportArea& viewportArea,
 	const SViewportBorder& axis,
 	const SViewportBorder& min2ndDimEdge,
@@ -1265,7 +1230,7 @@ KFindSplitNode< traits >::KFindSplitNode(
 	, d_min2ndDimEdge( min2ndDimEdge )
 	, d_max2ndDimEdge( max2ndDimEdge )
 	, d_sectposids( *sectposids )
-	, d_result( 0 )
+	, d_result( nullptr )
 {
 }
 
@@ -1284,13 +1249,13 @@ void KFindSplitNode< traits >::visitNode( SHeapNode* node )
 		if ( typename traits::compare_by_2nd_dim()( median, d_min2ndDimEdge ) )
 		{
 			SHeapItem* rightChild = node->getRightChild();
-			if ( rightChild != 0 )
+			if ( rightChild )
 				rightChild->accept( this );
 		}
 		else if ( typename traits::compare_by_2nd_dim()( d_max2ndDimEdge, median ) )
 		{
 			SHeapItem* leftChild = node->getLeftChild();
-			if ( leftChild != 0 )
+			if ( leftChild )
 				leftChild->accept( this );
 		}
 		else
@@ -1299,7 +1264,7 @@ void KFindSplitNode< traits >::visitNode( SHeapNode* node )
 			d_result = node;
 		}
 
-		// even if median is not within 2nd dim range, then the subtree root 
+		// even if median is not within 2nd dim range, then the subtree root
 		// may be in viewport area
 		if ( d_result != node )
 			tryAddItem( node );
@@ -1323,11 +1288,11 @@ template< typename traits >
 bool KFindSplitNode< traits >::isIn1stDimRange( const SHeapItem* item ) const
 {
 	/*
-		item as subtree-root it is the minimal (for left/top side) 
-		or maximal (for right/bottom side) x/y-coord in this heap, 
-		so can find split-node only if it is range [item-root, axis] 
-		for left/top or [axis, item-root] for right/bottom, if not 
-		then we know for sure that all other nodes also aren't in 
+		item as subtree-root it is the minimal (for left/top side)
+		or maximal (for right/bottom side) x/y-coord in this heap,
+		so can find split-node only if it is range [item-root, axis]
+		for left/top or [axis, item-root] for right/bottom, if not
+		then we know for sure that all other nodes also aren't in
 		the range
 	*/
 	const bool result = typename traits::is_in_1st_dim_range( d_axis )( item );
@@ -1359,7 +1324,7 @@ void KFindSplitNode< traits >::tryAddItem( const SHeapNode* node )
 template< typename is_in_1st_dim_range_t >
 struct SDumpSectPositionsTraits
 {
-	typedef is_in_1st_dim_range_t is_in_1st_dim_range;
+	using is_in_1st_dim_range = is_in_1st_dim_range_t;
 };
 
 
@@ -1367,24 +1332,24 @@ template< typename traits >
 class KDumpSectPositions : public KHeapItemVisitor
 {
 	public:
-		KDumpSectPositions( 
+		KDumpSectPositions(
 			const SViewportBorder& axis,
 			sect_pos_ids_t* sectposids );
 
 	public:
-		virtual void visitNode( SHeapNode* node );
-		virtual void visitDefault( SHeapItem* item );
+		void visitNode( SHeapNode* node ) override;
+		void visitDefault( SHeapItem* item ) override;
 
 	private:
 		const SViewportBorder& d_axis;
 		sect_pos_ids_t& d_sectposids;
 
-};		
+};
 
 // ----------------------------------------------------------------------------
 
 template< typename traits >
-KDumpSectPositions< traits >::KDumpSectPositions(	
+KDumpSectPositions< traits >::KDumpSectPositions(
 	const SViewportBorder& axis,
 	sect_pos_ids_t* sectposids )
 	: d_axis( axis )
@@ -1397,12 +1362,12 @@ void KDumpSectPositions< traits >::visitNode( SHeapNode* node )
 {
 	visitDefault( node );
 
-	SHeapItem* leftChild = node->getLeftChild(); 
-	if ( leftChild != 0 )
+	SHeapItem* leftChild = node->getLeftChild();
+	if ( leftChild )
 		leftChild->accept( this );
 
-	SHeapItem* rightChild = node->getRightChild(); 
-	if ( rightChild != 0 )
+	SHeapItem* rightChild = node->getRightChild();
+	if ( rightChild )
 		rightChild->accept( this );
 }
 
@@ -1420,13 +1385,13 @@ void KDumpSectPositions< traits >::visitDefault( SHeapItem* item )
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-template< 
-	typename is_in_1st_dim_range_t, 
+template<
+	typename is_in_1st_dim_range_t,
 	typename compare_by_2nd_dim_t >
 struct SSelectMedSectPositionsTraits
 {
-	typedef is_in_1st_dim_range_t is_in_1st_dim_range;
-	typedef compare_by_2nd_dim_t compare_by_2nd_dim;
+	using is_in_1st_dim_range = is_in_1st_dim_range_t;
+	using compare_by_2nd_dim = compare_by_2nd_dim_t;
 };
 
 
@@ -1434,7 +1399,7 @@ template< typename traits >
 class KSelectMedSectPositions : public KHeapItemVisitor
 {
 	public:
-		KSelectMedSectPositions( 
+		KSelectMedSectPositions(
 			const KViewportArea& viewportArea,
 			const SViewportBorder& axis,
 			const SViewportBorder& min2ndDimEdge,
@@ -1442,13 +1407,13 @@ class KSelectMedSectPositions : public KHeapItemVisitor
 			sect_pos_ids_t* sectposids );
 
 	public:
-		virtual void visitNode( SHeapNode* node );
-		virtual void visitDefault( SHeapItem* item );
+		void visitNode( SHeapNode* node ) override;
+		void visitDefault( SHeapItem* item ) override;
 
 	private:
 		void traverseLeftSubtree( SHeapNode* subtreeRoot );
 		void traverseRightSubtree( SHeapNode* subtreeRoot );
-		void dumpInnerSubtree( SHeapItem* root, const EChildSide subtreeSide );
+		void dumpInnerSubtree( SHeapItem* root, EChildSide subtreeSide );
 
 		bool isIn1stDimRange( SHeapItem* item ) const;
 		bool isItemInArea( SHeapItem* item ) const;
@@ -1459,11 +1424,11 @@ class KSelectMedSectPositions : public KHeapItemVisitor
 		const SViewportBorder& d_axis;
 		const SViewportBorder& d_min2ndDimEdge;
 		const SViewportBorder& d_max2ndDimEdge;
-		typedef SDumpSectPositionsTraits< typename traits::is_in_1st_dim_range > TDumpSectPositionsTraits;
+		using TDumpSectPositionsTraits = SDumpSectPositionsTraits< typename traits::is_in_1st_dim_range >;
 		KDumpSectPositions< TDumpSectPositionsTraits > d_dumpSectPositions;
 		sect_pos_ids_t& d_sectposids;
 
-};		
+};
 
 // ----------------------------------------------------------------------------
 
@@ -1503,14 +1468,14 @@ template< typename traits >
 void KSelectMedSectPositions< traits >::traverseLeftSubtree( SHeapNode* subtreeRoot )
 {
 	SHeapItem* item = subtreeRoot->getLeftChild();
-	while ( ( item != 0 ) && isIn1stDimRange( item ) )
+	while ( ( item != nullptr ) && isIn1stDimRange( item ) )
 	{
 		const SSectionPos* sectpos = item->d_sectpos;
 		if ( typename traits::compare_by_2nd_dim()( d_min2ndDimEdge, sectpos ) )
 			addItem( item );
 
 		const SSectionPos* median = item->getMedian();
-		if ( median != 0 )
+		if ( median )
 		{
 			if ( typename traits::compare_by_2nd_dim()( d_min2ndDimEdge, median ) )
 			{
@@ -1526,7 +1491,7 @@ void KSelectMedSectPositions< traits >::traverseLeftSubtree( SHeapNode* subtreeR
 		else
 		{
 			// it is leaf, stop the loop
-			item = 0;
+			item = nullptr;
 		}
 	}
 }
@@ -1535,14 +1500,14 @@ template< typename traits >
 void KSelectMedSectPositions< traits >::traverseRightSubtree( SHeapNode* subtreeRoot )
 {
 	SHeapItem* item = subtreeRoot->getRightChild();
-	while ( ( item != 0 ) && isIn1stDimRange( item ) )
+	while ( ( item != nullptr ) && isIn1stDimRange( item ) )
 	{
 		const SSectionPos* sectpos = item->d_sectpos;
 		if ( typename traits::compare_by_2nd_dim()( sectpos, d_max2ndDimEdge ) )
 			addItem( item );
 
 		const SSectionPos* median = item->getMedian();
-		if ( median != 0 )
+		if ( median )
 		{
 			if ( typename traits::compare_by_2nd_dim()( median, d_max2ndDimEdge ) )
 			{
@@ -1558,18 +1523,18 @@ void KSelectMedSectPositions< traits >::traverseRightSubtree( SHeapNode* subtree
 		else
 		{
 			// it is leaf, stop the loop
-			item = 0;			
+			item = nullptr;
 		}
 	}
 }
 
 template< typename traits >
-void KSelectMedSectPositions< traits >::dumpInnerSubtree( 
-	SHeapItem* root, 
-	const EChildSide subtreeSide )
+void KSelectMedSectPositions< traits >::dumpInnerSubtree(
+	SHeapItem* root,
+	EChildSide subtreeSide )
 {
 	SHeapItem* subtreeRoot = subtreeSide == RightChild ? root->getRightChild() : root->getLeftChild();
-	if ( subtreeRoot != 0 )
+	if ( subtreeRoot )
 		subtreeRoot->accept( &d_dumpSectPositions );
 }
 
@@ -1608,17 +1573,17 @@ void KSelectMedSectPositions< traits >::addItem( SHeapItem* item )
 // ----------------------------------------------------------------------------
 
 
-template< 
+template<
 	typename compare_by_1st_dim_t,
-	typename is_in_front_of_1st_dim_axis_t, 
-	typename is_behind_1st_dim_axis_t, 
+	typename is_in_front_of_1st_dim_axis_t,
+	typename is_behind_1st_dim_axis_t,
 	typename compare_by_2nd_dim_t >
 struct SSelectSectPositionsTraits
 {
-	typedef compare_by_1st_dim_t compare_by_1st_dim;
-	typedef is_in_front_of_1st_dim_axis_t is_in_front_of_1st_dim_axis; 
-	typedef is_behind_1st_dim_axis_t is_behind_1st_dim_axis;
-	typedef compare_by_2nd_dim_t compare_by_2nd_dim;
+	using compare_by_1st_dim = compare_by_1st_dim_t;
+	using is_in_front_of_1st_dim_axis = is_in_front_of_1st_dim_axis_t;
+	using is_behind_1st_dim_axis = is_behind_1st_dim_axis_t;
+	using compare_by_2nd_dim = compare_by_2nd_dim_t;
 };
 
 
@@ -1634,8 +1599,8 @@ class KSelectSectPositions : public KIntervalTreeItemVisitor
 			sect_pos_ids_t* sectposids );
 
 	public:
-		virtual void visitNode( SIntervalTreeNode* node );
-		virtual void visitLeaf( SIntervalTreeLeaf* leaf );
+		void visitNode( SIntervalTreeNode* node ) override;
+		void visitLeaf( SIntervalTreeLeaf* leaf ) override;
 
 	private:
 		void traverseLeftTopMedSectPositions( SHeapItem* medSectPositionsRoot );
@@ -1674,19 +1639,19 @@ void KSelectSectPositions< traits >::visitNode( SIntervalTreeNode* node )
 	if ( typename traits::compare_by_1st_dim()( d_axis, medSectPos ) )
 	{
 		SHeapItem* medSectPositionsOnLeftTopRoot = node->d_medSectPositionsOnLeftTop;
-		if ( medSectPositionsOnLeftTopRoot != 0 )
+		if ( medSectPositionsOnLeftTopRoot )
 			traverseLeftTopMedSectPositions( medSectPositionsOnLeftTopRoot );
 		SIntervalTreeItem* leftChild = node->d_leftChild;
-		if ( leftChild != 0 )
+		if ( leftChild )
 			leftChild->accept( this );
 	}
 	else
 	{
 		SHeapItem* medSectPositionsOnRightBottomRoot = node->d_medSectPositionsOnRightBottom;
-		if ( medSectPositionsOnRightBottomRoot != 0 )
+		if ( medSectPositionsOnRightBottomRoot )
 			traverseRightBottomMedSectPositions( medSectPositionsOnRightBottomRoot );
 		SIntervalTreeItem* rightChild = node->d_rightChild;
-		if ( rightChild != 0 )
+		if ( rightChild )
 			rightChild->accept( this );
 	}
 }
@@ -1698,11 +1663,11 @@ void KSelectSectPositions< traits >::visitLeaf( SIntervalTreeLeaf* leaf )
 	const SSectionPos* endSectPos = leaf->d_endSectPos;
 	assert( KSegmentsManager::isSection( beginSectPos, endSectPos ) );
 	if ( typename traits::compare_by_1st_dim()( beginSectPos, d_axis )
-		&& typename traits::compare_by_1st_dim()( d_axis, endSectPos ) 
+		&& typename traits::compare_by_1st_dim()( d_axis, endSectPos )
 		&& typename traits::compare_by_2nd_dim()( d_min2ndDimEdge, beginSectPos )
 		&& typename traits::compare_by_2nd_dim()( beginSectPos, d_max2ndDimEdge ) )
 	{
-		// add only id of the beginning of section, it is enough to 
+		// add only id of the beginning of section, it is enough to
 		// draw the whole section in the next stage
 		const sect_pos_id_t sectposid = beginSectPos->d_id;
 		d_sectposids.push_back( sectposid );
@@ -1711,11 +1676,11 @@ void KSelectSectPositions< traits >::visitLeaf( SIntervalTreeLeaf* leaf )
 
 template< typename traits >
 void KSelectSectPositions< traits >::traverseLeftTopMedSectPositions( SHeapItem* medSectPositionsRoot )
-{	
-	typedef SFindSplitNodeTraits< 
+{
+	using SFindLeftTopSplitNodeTraits = SFindSplitNodeTraits<
 		typename traits::is_in_front_of_1st_dim_axis,
-		typename traits::compare_by_2nd_dim > SFindLeftTopSplitNodeTraits;
-	KFindSplitNode< SFindLeftTopSplitNodeTraits > findSplitNode( 
+		typename traits::compare_by_2nd_dim >;
+	KFindSplitNode< SFindLeftTopSplitNodeTraits > findSplitNode(
 		d_viewportArea,
 		d_axis,
 		d_min2ndDimEdge,
@@ -1723,13 +1688,13 @@ void KSelectSectPositions< traits >::traverseLeftTopMedSectPositions( SHeapItem*
 		&d_sectposids );
 	medSectPositionsRoot->accept( &findSplitNode );
 	SHeapItem* splitNode = findSplitNode.getResult();
-	if ( splitNode != 0 )
+	if ( splitNode )
 	{
-		typedef SSelectMedSectPositionsTraits<
+		using SSelectMedLeftTopSectPositionsTraits = SSelectMedSectPositionsTraits<
 			typename traits::is_in_front_of_1st_dim_axis,
-			typename traits::compare_by_2nd_dim > SSelectMedLeftTopSectPositionsTraits;
-		KSelectMedSectPositions< SSelectMedLeftTopSectPositionsTraits > selectMedSectPositions( 
-			d_viewportArea, 
+			typename traits::compare_by_2nd_dim >;
+		KSelectMedSectPositions< SSelectMedLeftTopSectPositionsTraits > selectMedSectPositions(
+			d_viewportArea,
 			d_axis,
 			d_min2ndDimEdge,
 			d_max2ndDimEdge,
@@ -1740,11 +1705,11 @@ void KSelectSectPositions< traits >::traverseLeftTopMedSectPositions( SHeapItem*
 
 template< typename traits >
 void KSelectSectPositions< traits >::traverseRightBottomMedSectPositions( SHeapItem* medSectPositionsRoot )
-{	
-	typedef SFindSplitNodeTraits< 
+{
+	using SFindRightBottomSplitNodeTraits = SFindSplitNodeTraits<
 		typename traits::is_behind_1st_dim_axis,
-		typename traits::compare_by_2nd_dim > SFindRightBottomSplitNodeTraits;
-	KFindSplitNode< SFindRightBottomSplitNodeTraits > findSplitNode( 
+		typename traits::compare_by_2nd_dim >;
+	KFindSplitNode< SFindRightBottomSplitNodeTraits > findSplitNode(
 		d_viewportArea,
 		d_axis,
 		d_min2ndDimEdge,
@@ -1752,13 +1717,13 @@ void KSelectSectPositions< traits >::traverseRightBottomMedSectPositions( SHeapI
 		&d_sectposids );
 	medSectPositionsRoot->accept( &findSplitNode );
 	SHeapItem* splitNode = findSplitNode.getResult();
-	if ( splitNode != 0 )
+	if ( splitNode )
 	{
-		typedef SSelectMedSectPositionsTraits<
+		using SSelectMedRightBottomSectPositionsTraits = SSelectMedSectPositionsTraits<
 			typename traits::is_behind_1st_dim_axis,
-			typename traits::compare_by_2nd_dim > SSelectMedRightBottomSectPositionsTraits;
-		KSelectMedSectPositions< SSelectMedRightBottomSectPositionsTraits > selectMedSectPositions( 
-			d_viewportArea, 
+			typename traits::compare_by_2nd_dim >;
+		KSelectMedSectPositions< SSelectMedRightBottomSectPositionsTraits > selectMedSectPositions(
+			d_viewportArea,
 			d_axis,
 			d_min2ndDimEdge,
 			d_max2ndDimEdge,
@@ -1780,7 +1745,7 @@ class KIntervalTree::Impl
 
 	public:
 		template< typename traits >
-		SIntervalTreeItem* create( const EOrientation orientation );
+		SIntervalTreeItem* create( EOrientation orientation );
 
 		template< typename traits >
 		void selectSectPositions(
@@ -1791,9 +1756,9 @@ class KIntervalTree::Impl
 			SIntervalTreeItem* root,
 			sect_pos_ids_t* sectposids ) const;
 
-		void selectCrossSections( 
+		void selectCrossSections(
 			const KViewportArea& viewportArea,
-			const sect_pos_ids_t& crosssectposids, 
+			const sect_pos_ids_t& crosssectposids,
 			sect_pos_ids_t* sectposids ) const;
 
 	public:
@@ -1802,10 +1767,10 @@ class KIntervalTree::Impl
 		SIntervalTreeItem* d_vertRoot;
 };
 
-KIntervalTree::Impl::Impl( const KSegmentsManager& segmentsManager ) 
+KIntervalTree::Impl::Impl( const KSegmentsManager& segmentsManager )
 	: d_segmentsManager( segmentsManager )
-	, d_horzRoot( 0 )
-	, d_vertRoot( 0 )
+	, d_horzRoot( nullptr )
+	, d_vertRoot( nullptr )
 {
 }
 
@@ -1816,18 +1781,18 @@ KIntervalTree::Impl::~Impl()
 }
 
 template< typename traits >
-SIntervalTreeItem* KIntervalTree::Impl::create( const EOrientation orientation )
+SIntervalTreeItem* KIntervalTree::Impl::create( EOrientation orientation )
 {
-	SIntervalTreeItem* treeRoot = 0;
+	SIntervalTreeItem* treeRoot = nullptr;
 	section_positions_t sect_positions;
 	if ( d_segmentsManager.getSectPositions( orientation, &sect_positions ) )
 	{
 		std::sort( sect_positions.begin(), sect_positions.end(), typename traits::compare_by_1st_dim() );
-		assert( std::adjacent_find( 
+		assert( std::adjacent_find(
 			sect_positions.begin(), sect_positions.end() ) == sect_positions.end() ); // items should be unique
 		KIntervalTreeBuilder< traits> treeBuilder( d_segmentsManager );
 		treeRoot = treeBuilder.run( sect_positions );
-		typedef SCheckIntervalTreeConsistencyTraits< typename traits::compare_by_1st_dim > checker_traits_t;
+		using checker_traits_t = SCheckIntervalTreeConsistencyTraits< typename traits::compare_by_1st_dim >;
 		assert( KCheckIntervalTreeConsistency< checker_traits_t >::run( treeRoot, sect_positions ) );
 
 	}
@@ -1843,10 +1808,10 @@ void KIntervalTree::Impl::selectSectPositions(
 	SIntervalTreeItem* root,
 	sect_pos_ids_t* sectposids ) const
 {
-	if ( root != 0 )
+	if ( root )
 	{
-		KSelectSectPositions< traits > selectSectPositions( 
-			viewportArea, 
+		KSelectSectPositions< traits > selectSectPositions(
+			viewportArea,
 			axis,
 			min2ndDimEdge,
 			max2ndDimEdge,
@@ -1855,9 +1820,9 @@ void KIntervalTree::Impl::selectSectPositions(
 	}
 }
 
-void KIntervalTree::Impl::selectCrossSections( 
+void KIntervalTree::Impl::selectCrossSections(
 	const KViewportArea& viewportArea,
-	const sect_pos_ids_t& crosssectposids, 
+	const sect_pos_ids_t& crosssectposids,
 	sect_pos_ids_t* sectposids ) const
 {
 	const SViewportBorder& rightEdge = viewportArea.getRightEdge();
@@ -1866,11 +1831,8 @@ void KIntervalTree::Impl::selectCrossSections(
 	const SViewportBorder& bottomEdge = viewportArea.getBottomEdge();
 	const coord_t bottom = bottomEdge.d_border.y;
 
-	for ( sect_pos_ids_cit it = crosssectposids.begin()
-		; it != crosssectposids.end()
-		; ++it )
+	for ( const sect_pos_id_t sectposid : crosssectposids )
 	{
-		const sect_pos_id_t sectposid = *it;
 		const SPoint& sectionRectRightBottomCorner = d_segmentsManager.getSectionCrossPoint( sectposid );
 		if ( ( right < sectionRectRightBottomCorner.x ) && ( bottom < sectionRectRightBottomCorner.y ) )
 		{
@@ -1884,10 +1846,10 @@ void KIntervalTree::Impl::selectCrossSections(
 KIntervalTree::KIntervalTree( const KSegmentsManager& segmentsManager )
 	: impl( new Impl( segmentsManager ) )
 {
-	typedef SIntervalTreeBuilderTraits< utils::compare_by_x, utils::compare_by_y > SHorizontalTreeTraits;
+	using SHorizontalTreeTraits = SIntervalTreeBuilderTraits< utils::compare_by_x, utils::compare_by_y >;
 	impl->d_horzRoot = impl->create< SHorizontalTreeTraits >( Horizontal );
 
-	typedef SIntervalTreeBuilderTraits< utils::compare_by_y, utils::compare_by_x > SVerticalTreeTraits;
+	using SVerticalTreeTraits = SIntervalTreeBuilderTraits< utils::compare_by_y, utils::compare_by_x >;
 	impl->d_vertRoot = impl->create< SVerticalTreeTraits >( Vertical );
 }
 
@@ -1901,34 +1863,34 @@ void KIntervalTree::selectSectPositions(
 	sect_pos_ids_t* sectposids ) const
 {
 	// horizontal-axis tree
-	typedef is_in_left_top_side_range< utils::compare_by_x, SViewportBorder > is_in_front_of_horz_axis;
-	typedef is_in_right_bottom_side_range< utils::compare_by_x, SViewportBorder > is_behind_horz_axis;
+	using is_in_front_of_horz_axis = is_in_left_top_side_range< utils::compare_by_x, SViewportBorder >;
+	using is_behind_horz_axis = is_in_right_bottom_side_range< utils::compare_by_x, SViewportBorder >;
 
-	typedef SSelectSectPositionsTraits<
+	using SSelectHorzSectPositionsTraits = SSelectSectPositionsTraits<
 		utils::compare_by_x,
-		is_in_front_of_horz_axis, 
-		is_behind_horz_axis, 
-		utils::compare_by_y > SSelectHorzSectPositionsTraits;
+		is_in_front_of_horz_axis,
+		is_behind_horz_axis,
+		utils::compare_by_y >;
 
 	const SViewportBorder& topEdge = viewportArea.getTopEdge();
 	const SViewportBorder& bottomEdge = viewportArea.getBottomEdge();
 
 	const SViewportBorder& leftAxis = viewportArea.getLeftAxis();
-	impl->selectSectPositions< SSelectHorzSectPositionsTraits >( 
-		viewportArea, 
+	impl->selectSectPositions< SSelectHorzSectPositionsTraits >(
+		viewportArea,
 		leftAxis,
 		topEdge,
 		bottomEdge,
-		impl->d_horzRoot, 
+		impl->d_horzRoot,
 		sectposids );
 
 	const SViewportBorder& rightAxis = viewportArea.getRightAxis();
-	impl->selectSectPositions< SSelectHorzSectPositionsTraits >( 
-		viewportArea, 
+	impl->selectSectPositions< SSelectHorzSectPositionsTraits >(
+		viewportArea,
 		rightAxis,
 		topEdge,
 		bottomEdge,
-		impl->d_horzRoot, 
+		impl->d_horzRoot,
 		sectposids );
 
 	/*
@@ -1940,50 +1902,50 @@ void KIntervalTree::selectSectPositions(
 		in such case rect of interval section fully covers viewport rect
 		to select it find horz sections which passes left axis above of vieport rect and check
 		whether its right-bottom corner is behind/below of viewport rect
-	*/ 
+	*/
 	const SViewportBorder& mapTopBorder = viewportArea.getMapTopBorder();
 	sect_pos_ids_t crosssectposids;
-	impl->selectSectPositions< SSelectHorzSectPositionsTraits >( 
-		viewportArea, 
+	impl->selectSectPositions< SSelectHorzSectPositionsTraits >(
+		viewportArea,
 		leftAxis,
 		mapTopBorder,
 		topEdge,
-		impl->d_horzRoot, 
+		impl->d_horzRoot,
 		&crosssectposids );
 	impl->selectCrossSections( viewportArea, crosssectposids, sectposids );
 
 	// vertical-axis tree
-	typedef is_in_left_top_side_range< utils::compare_by_y, SViewportBorder > is_in_front_of_vert_axis;
-	typedef is_in_right_bottom_side_range< utils::compare_by_y, SViewportBorder > is_behind_vert_axis;
+	using is_in_front_of_vert_axis = is_in_left_top_side_range< utils::compare_by_y, SViewportBorder >;
+	using is_behind_vert_axis = is_in_right_bottom_side_range< utils::compare_by_y, SViewportBorder >;
 
-	typedef SSelectSectPositionsTraits<
+	using SSelectVertSectPositionsTraits = SSelectSectPositionsTraits<
 		utils::compare_by_y,
-		is_in_front_of_vert_axis, 
-		is_behind_vert_axis, 
-		utils::compare_by_x > SSelectVertSectPositionsTraits;
+		is_in_front_of_vert_axis,
+		is_behind_vert_axis,
+		utils::compare_by_x >;
 
 	const SViewportBorder& leftEdge = viewportArea.getLeftEdge();
 	const SViewportBorder& rightEdge = viewportArea.getRightEdge();
 
 	const SViewportBorder& topAxis = viewportArea.getTopAxis();
-	impl->selectSectPositions< SSelectVertSectPositionsTraits >( 
-		viewportArea, 
+	impl->selectSectPositions< SSelectVertSectPositionsTraits >(
+		viewportArea,
 		topAxis,
 		leftEdge,
 		rightEdge,
-		impl->d_vertRoot, 
+		impl->d_vertRoot,
 		sectposids );
 
-	// don't need to check sections passing bottom axis, they will be 
-	// detected in other searches, because they pass remaining edges or 
+	// don't need to check sections passing bottom axis, they will be
+	// detected in other searches, because they pass remaining edges or
 	// have at least one end-point inside the viewport rect
 	//const SViewportBorder& bottomAxis = viewportArea.getBottomAxis();
-	//impl->selectSectPositions< SSelectVertSectPositionsTraits >( 
-	//	viewportArea, 
+	//impl->selectSectPositions< SSelectVertSectPositionsTraits >(
+	//	viewportArea,
 	//	bottomAxis,
 	//	leftEdge,
 	//	rightEdge,
-	//	impl->d_vertRoot, 
+	//	impl->d_vertRoot,
 	//	sectposids );
 }
 

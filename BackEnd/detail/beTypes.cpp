@@ -6,8 +6,8 @@ namespace be
 {
 
 SSize::SSize(
-	const coord_t w,
-	const coord_t h )
+	coord_t w,
+	coord_t h )
 	: width ( w )
 	, height( h )
 {
@@ -22,8 +22,8 @@ bool SSize::operator!=( const SSize& rhs ) const
 // ----------------------------------------------------------------------------
 
 SPoint::SPoint(
-	const coord_t ix,
-	const coord_t iy )
+	coord_t ix,
+	coord_t iy )
 	: x( ix )
 	, y( iy )
 {
@@ -52,12 +52,12 @@ SSize SPoint::operator-( const SPoint& rhs ) const
 // ----------------------------------------------------------------------------
 
 SRect::SRect(
-	const coord_t l,
-	const coord_t t,
-	const coord_t r,
-	const coord_t b )
+	coord_t l,
+	coord_t t,
+	coord_t r,
+	coord_t b )
 	: left( l )
-	, top( t ) 
+	, top( t )
 	, right( r )
 	, bottom( b )
 {
@@ -67,7 +67,7 @@ SRect::SRect(
 	const SPoint& topLeft,
 	const SSize& size )
 	: left( topLeft.x )
-	, top( topLeft.y ) 
+	, top( topLeft.y )
 	, right( topLeft.x + size.width )
 	, bottom( topLeft.y + size.height )
 {
@@ -75,7 +75,7 @@ SRect::SRect(
 
 SRect::SRect(const SSize& size )
 	: left( 0 )
-	, top( 0 ) 
+	, top( 0 )
 	, right( size.width )
 	, bottom( size.height )
 {
@@ -83,16 +83,16 @@ SRect::SRect(const SSize& size )
 
 bool SRect::operator!=( const SRect& rhs ) const
 {
-	const bool result 
+	const bool result
 		= ( left != rhs.left )
-		|| ( top != rhs.top ) 
+		|| ( top != rhs.top )
 		|| ( right != rhs.right )
 		|| ( bottom != rhs.bottom )
 		;
 	return result;
 }
 
-const SPoint SRect::getCenter() const
+SPoint SRect::getCenter() const
 {
 	const coord_t x = left + ( right - left ) / 2;
 	const coord_t y = top + ( bottom - top ) / 2;
@@ -100,19 +100,19 @@ const SPoint SRect::getCenter() const
 	return result;
 }
 
-const SPoint SRect::getTopLeft() const
+SPoint SRect::getTopLeft() const
 {
 	const SPoint result( left, top );
 	return result;
 }
 
-const SPoint SRect::getBottomRight() const
+SPoint SRect::getBottomRight() const
 {
 	const SPoint result( right, bottom );
 	return result;
 }
 
-const SSize SRect::getSize() const
+SSize SRect::getSize() const
 {
 	const coord_t width = right - left;
 	const coord_t height = bottom - top;
@@ -158,10 +158,10 @@ SMoveData::SMoveData( const SSize& delta )
 
 // ----------------------------------------------------------------------------
 
-SZoomData::SZoomData( 
-	const EKind kind, 
-	const int delta,
-	const bool zoomInPlace,
+SZoomData::SZoomData(
+	EKind kind,
+	int delta,
+	bool zoomInPlace,
 	const be::SPoint& focusScreenPoint )
 	: d_kind( kind )
 	, d_delta( delta )

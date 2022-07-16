@@ -12,7 +12,7 @@ struct IBitmap;
 struct IController
 {
 	public:
-		virtual ~IController();
+		virtual ~IController() = default;
 
 	public:
 		virtual bool setDeviceSize( const SSize& deviceSize ) = 0;

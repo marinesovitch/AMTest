@@ -22,10 +22,10 @@ struct SRangeTreeLeaf;
 class KRangeTreeItemVisitor
 {
 	protected:
-		KRangeTreeItemVisitor();
+		KRangeTreeItemVisitor() = default;
 
 	public:
-		virtual ~KRangeTreeItemVisitor();
+		virtual ~KRangeTreeItemVisitor() = default;
 
 	public:
 		virtual void visitNodeBase( SRangeTreeNodeBase* node );
@@ -34,17 +34,17 @@ class KRangeTreeItemVisitor
 		virtual void visitLeaf( SRangeTreeLeaf* leaf );
 		virtual void visitDefault( SRangeTreeItem* item );
 
-};		
+};
 
 // ----------------------------------------------------------------------------
 
 struct SRangeTreeItem
 {
 	protected:
-		SRangeTreeItem( const SPointPos* pointPos );
+		explicit SRangeTreeItem( const SPointPos* pointPos );
 
 	public:
-		virtual ~SRangeTreeItem();
+		virtual ~SRangeTreeItem() = default;
 
 	public:
 		virtual bool isLeaf() const = 0;
@@ -63,35 +63,31 @@ SRangeTreeItem::SRangeTreeItem( const SPointPos* pointPos )
 {
 }
 
-SRangeTreeItem::~SRangeTreeItem()
-{
-}
-
 // ----------------------------------------------------------------------------
 
 struct SRangeTreeNodeBase : public SRangeTreeItem
 {
 	public:
-		SRangeTreeNodeBase( const SPointPos* pointPos );
-		virtual ~SRangeTreeNodeBase();
+		explicit SRangeTreeNodeBase( const SPointPos* pointPos );
+		~SRangeTreeNodeBase() override;
 
 	public:
-		virtual bool isLeaf() const;
+		bool isLeaf() const override;
 
-		virtual SRangeTreeItem* getLeftChild();
-		virtual SRangeTreeItem* getRightChild();
+		SRangeTreeItem* getLeftChild() override;
+		SRangeTreeItem* getRightChild() override;
 
-		virtual void accept( KRangeTreeItemVisitor* visitor );
+		void accept( KRangeTreeItemVisitor* visitor ) override;
 
 	public:
 		SRangeTreeItem* d_leftChild;
 		SRangeTreeItem* d_rightChild;
 };
 
-SRangeTreeNodeBase::SRangeTreeNodeBase( const SPointPos* pointPos ) 
+SRangeTreeNodeBase::SRangeTreeNodeBase( const SPointPos* pointPos )
 	: SRangeTreeItem( pointPos )
-	, d_leftChild( 0 )
-	, d_rightChild( 0 )
+	, d_leftChild( nullptr )
+	, d_rightChild( nullptr )
 {
 }
 
@@ -126,10 +122,10 @@ void SRangeTreeNodeBase::accept( KRangeTreeItemVisitor* visitor )
 struct SRangeTreeRoot : public SRangeTreeNodeBase
 {
 	public:
-		SRangeTreeRoot( const SPointPos* pointPos );
+		explicit SRangeTreeRoot( const SPointPos* pointPos );
 
 	public:
-		virtual void accept( KRangeTreeItemVisitor* visitor );
+		void accept( KRangeTreeItemVisitor* visitor ) override;
 };
 
 SRangeTreeRoot::SRangeTreeRoot( const SPointPos* pointPos )
@@ -147,10 +143,10 @@ void SRangeTreeRoot::accept( KRangeTreeItemVisitor* visitor )
 struct SRangeTreeNode : public SRangeTreeNodeBase
 {
 	public:
-		SRangeTreeNode( const SPointPos* pointPos );
+		explicit SRangeTreeNode( const SPointPos* pointPos );
 
 	public:
-		virtual void accept( KRangeTreeItemVisitor* visitor );
+		void accept( KRangeTreeItemVisitor* visitor ) override;
 
 	public:
 		point_positions_t d_point_positions_by_y;
@@ -171,15 +167,15 @@ void SRangeTreeNode::accept( KRangeTreeItemVisitor* visitor )
 struct SRangeTreeLeaf : public SRangeTreeItem
 {
 	public:
-		SRangeTreeLeaf( const SPointPos* pointPos );
+		explicit SRangeTreeLeaf( const SPointPos* pointPos );
 
 	public:
-		virtual bool isLeaf() const;
+		bool isLeaf() const override;
 
-		virtual SRangeTreeItem* getLeftChild();
-		virtual SRangeTreeItem* getRightChild();
+		SRangeTreeItem* getLeftChild() override;
+		SRangeTreeItem* getRightChild() override;
 
-		virtual void accept( KRangeTreeItemVisitor* visitor );
+		void accept( KRangeTreeItemVisitor* visitor ) override;
 };
 
 SRangeTreeLeaf::SRangeTreeLeaf( const SPointPos* pointPos ) : SRangeTreeItem( pointPos )
@@ -193,12 +189,12 @@ bool SRangeTreeLeaf::isLeaf() const
 
 SRangeTreeItem* SRangeTreeLeaf::getLeftChild()
 {
-	return 0;
+	return nullptr;
 }
 
 SRangeTreeItem* SRangeTreeLeaf::getRightChild()
 {
-	return 0;
+	return nullptr;
 }
 
 void SRangeTreeLeaf::accept( KRangeTreeItemVisitor* visitor )
@@ -207,14 +203,6 @@ void SRangeTreeLeaf::accept( KRangeTreeItemVisitor* visitor )
 }
 
 // ----------------------------------------------------------------------------
-
-KRangeTreeItemVisitor::KRangeTreeItemVisitor()
-{
-}
-
-KRangeTreeItemVisitor::~KRangeTreeItemVisitor()
-{
-}
 
 void KRangeTreeItemVisitor::visitNodeBase( SRangeTreeNodeBase* node )
 {
@@ -244,12 +232,12 @@ void KRangeTreeItemVisitor::visitDefault( SRangeTreeItem* /*item*/ )
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-typedef std::set< const SPointPos* > pointpos_set_t;
-typedef pointpos_set_t::iterator pointpos_set_it;
+using pointpos_set_t = std::set< const SPointPos* >;
+using pointpos_set_it = pointpos_set_t::iterator;
 
 struct SCheckResult
 {
-	SCheckResult( const point_positions_t& point_positions )
+	explicit SCheckResult( const point_positions_t& point_positions )
 		: d_consistent( true )
 		, d_pointpos_set( point_positions.begin(), point_positions.end() )
 	{
@@ -262,9 +250,9 @@ struct SCheckResult
 class KCheckRangeTreeConsistency : public KRangeTreeItemVisitor
 {
 	public:
-		KCheckRangeTreeConsistency( 
-			const SRangeTreeNodeBase* parent, 
-			const EChildSide childSide,
+		KCheckRangeTreeConsistency(
+			const SRangeTreeNodeBase* parent,
+			EChildSide childSide,
 			SCheckResult* result );
 
 	public:
@@ -273,9 +261,9 @@ class KCheckRangeTreeConsistency : public KRangeTreeItemVisitor
 			const point_positions_t& point_positions );
 
 	public:
-		virtual void visitNodeBase( SRangeTreeNodeBase* node );
-		virtual void visitLeaf( SRangeTreeLeaf* leaf );
-		virtual void visitDefault( SRangeTreeItem* item );
+		void visitNodeBase( SRangeTreeNodeBase* node ) override;
+		void visitLeaf( SRangeTreeLeaf* leaf ) override;
+		void visitDefault( SRangeTreeItem* item ) override;
 
 	private:
 		const SRangeTreeNodeBase* d_parent;
@@ -287,9 +275,9 @@ class KCheckRangeTreeConsistency : public KRangeTreeItemVisitor
 
 // ----------------------------------------------------------------------------
 
-KCheckRangeTreeConsistency::KCheckRangeTreeConsistency( 
+KCheckRangeTreeConsistency::KCheckRangeTreeConsistency(
 	const SRangeTreeNodeBase* parent,
-	const EChildSide childSide,
+	EChildSide childSide,
 	SCheckResult* result )
 	: d_parent( parent )
 	, d_childSide( childSide )
@@ -297,16 +285,16 @@ KCheckRangeTreeConsistency::KCheckRangeTreeConsistency(
 {
 }
 
-bool KCheckRangeTreeConsistency::run( 
+bool KCheckRangeTreeConsistency::run(
 	SRangeTreeItem* root,
 	const point_positions_t& point_positions )
 {
 	bool result = true;
 	#ifdef ENABLE_TREE_CHECKERS
-	if ( root != 0 )
+	if ( root != nullptr )
 	{
 		SCheckResult checkResult( point_positions );
-		KCheckRangeTreeConsistency checkConsistency( 0, NoParent, &checkResult );
+		KCheckRangeTreeConsistency checkConsistency( nullptr, NoParent, &checkResult );
 		root->accept( &checkConsistency );
 		result = checkResult.d_consistent && checkResult.d_pointpos_set.empty();
 	}
@@ -319,14 +307,14 @@ void KCheckRangeTreeConsistency::visitNodeBase( SRangeTreeNodeBase* node )
 	visitDefault( node );
 
 	SRangeTreeItem* leftChild = node->getLeftChild();
-	if ( leftChild != 0 )
+	if ( leftChild != nullptr )
 	{
 		KCheckRangeTreeConsistency checkConsistency( node, LeftChild, d_result );
 		leftChild->accept( &checkConsistency );
 	}
 
 	SRangeTreeItem* rightChild = node->getRightChild();
-	if ( rightChild != 0 )
+	if ( rightChild != nullptr )
 	{
 		KCheckRangeTreeConsistency checkConsistency( node, RightChild, d_result );
 		rightChild->accept( &checkConsistency );
@@ -339,18 +327,18 @@ void KCheckRangeTreeConsistency::visitLeaf( SRangeTreeLeaf* leaf )
 
 	pointpos_set_t& pointpos_set = d_result->d_pointpos_set;
 	const SPointPos* pointPos = leaf->d_pointPos;
-	pointpos_set_it it = d_result->d_pointpos_set.find( pointPos );
+	auto it = d_result->d_pointpos_set.find( pointPos );
 	assert( it != pointpos_set.end() );
 	pointpos_set.erase( it );
 }
 
 void KCheckRangeTreeConsistency::visitDefault( SRangeTreeItem* item )
 {
-	if ( d_parent != 0 )
+	if ( d_parent != nullptr )
 	{
 		bool consistent = true;
 		const SPointPos* parentPos = d_parent->d_pointPos;
-		const SPointPos* itemPos = item->d_pointPos; 
+		const SPointPos* itemPos = item->d_pointPos;
 		if ( d_childSide == LeftChild )
 		{
 			if ( !utils::less_by_x( itemPos, parentPos ) && ( itemPos != parentPos ) )
@@ -382,8 +370,8 @@ class KCreateAssociatedStructure : public KRangeTreeItemVisitor
 			point_positions_cit end );
 
 	public:
-		virtual void visitRoot( SRangeTreeRoot* root );
-		virtual void visitNode( SRangeTreeNode* node );
+		void visitRoot( SRangeTreeRoot* root ) override;
+		void visitNode( SRangeTreeNode* node ) override;
 
 	private:
 		point_positions_cit d_begin;
@@ -407,9 +395,9 @@ void KCreateAssociatedStructure::visitRoot( SRangeTreeRoot* /*root*/ )
 void KCreateAssociatedStructure::visitNode( SRangeTreeNode* node )
 {
 	point_positions_t point_positions_by_y( d_begin, d_end );
-	std::sort( 
-		point_positions_by_y.begin(), 
-		point_positions_by_y.end(), 
+	std::sort(
+		point_positions_by_y.begin(),
+		point_positions_by_y.end(),
 		utils::compare_by_y() );
 
 	node->d_point_positions_by_y.swap( point_positions_by_y );
@@ -421,7 +409,7 @@ void KCreateAssociatedStructure::visitNode( SRangeTreeNode* node )
 class KRangeTreeBuilder
 {
 	public:
-		KRangeTreeBuilder();
+		KRangeTreeBuilder() = default;
 
 	public:
 		SRangeTreeItem* run( const point_positions_t& point_positions_by_x );
@@ -438,21 +426,17 @@ class KRangeTreeBuilder
 			point_positions_cit v_split_node_it,
 			point_positions_cit end );
 
-		SRangeTreeItem* createLeaf( 
+		SRangeTreeItem* createLeaf(
 			const SPointPos* pointPos );
 
 };
 
 // ----------------------------------------------------------------------------
 
-KRangeTreeBuilder::KRangeTreeBuilder()
-{
-}
-
 SRangeTreeItem* KRangeTreeBuilder::run( const point_positions_t& point_positions_by_x )
 {
-	point_positions_cit begin = point_positions_by_x.begin();
-	point_positions_cit end = point_positions_by_x.end();
+	auto begin = point_positions_by_x.begin();
+	auto end = point_positions_by_x.end();
 	SRangeTreeItem* root = createItem< SRangeTreeRoot >( begin, end );
 	return root;
 }
@@ -464,11 +448,11 @@ SRangeTreeItem* KRangeTreeBuilder::createItem(
 	point_positions_cit begin,
 	point_positions_cit end )
 {
-	SRangeTreeItem* result = 0;
+	SRangeTreeItem* result = nullptr;
 	const std::size_t subtreeNodeCount = std::distance( begin, end );
 	if ( 1 < subtreeNodeCount )
 	{
-		point_positions_cit v_split_node_it = utils::get_median( begin, end );
+		auto v_split_node_it = utils::get_median( begin, end );
 		assert( v_split_node_it != end );
 		result = createNode< TTreeNode >( begin, v_split_node_it, end );
 	}
@@ -492,12 +476,12 @@ SRangeTreeItem* KRangeTreeBuilder::createNode(
 	KCreateAssociatedStructure createAssociatedStructure( begin, end );
 	node->accept( &createAssociatedStructure );
 
-	point_positions_cit lbegin = begin;
-	point_positions_cit lend = v_split_node_it + 1;
+	auto lbegin = begin;
+	auto lend = v_split_node_it + 1;
 	node->d_leftChild = createItem< SRangeTreeNode >( lbegin, lend );
 
-	point_positions_cit rbegin = lend;
-	point_positions_cit rend = end;
+	auto rbegin = lend;
+	auto rend = end;
 	node->d_rightChild = createItem< SRangeTreeNode >( rbegin, rend );
 
 	return node;
@@ -505,8 +489,7 @@ SRangeTreeItem* KRangeTreeBuilder::createNode(
 
 SRangeTreeItem* KRangeTreeBuilder::createLeaf( const SPointPos* pointPos )
 {
-	SRangeTreeLeaf* result = new SRangeTreeLeaf( pointPos );
-	return result;
+	return new SRangeTreeLeaf( pointPos );
 }
 
 // ----------------------------------------------------------------------------
@@ -515,13 +498,13 @@ SRangeTreeItem* KRangeTreeBuilder::createLeaf( const SPointPos* pointPos )
 class KSelectSubtreePoints : public KRangeTreeItemVisitor
 {
 	public:
-		KSelectSubtreePoints( 
+		KSelectSubtreePoints(
 			const KViewportArea& viewportArea,
 			point_ids_t* pointids );
 
 	public:
-		virtual void visitNode( SRangeTreeNode* node );
-		virtual void visitDefault( SRangeTreeItem* item );
+		void visitNode( SRangeTreeNode* node ) override;
+		void visitDefault( SRangeTreeItem* item ) override;
 
 	private:
 		void addPoint( const SPointPos* pointPos );
@@ -530,7 +513,7 @@ class KSelectSubtreePoints : public KRangeTreeItemVisitor
 		const KViewportArea& d_viewportArea;
 		point_ids_t& d_pointids;
 
-};		
+};
 
 KSelectSubtreePoints::KSelectSubtreePoints(
 	const KViewportArea& viewportArea,
@@ -545,22 +528,22 @@ void KSelectSubtreePoints::visitNode( SRangeTreeNode* node )
 	const point_positions_t& point_positions_by_y = node->d_point_positions_by_y;
 
 	const SViewportBorder& topEdge = d_viewportArea.getTopEdge();
-	point_positions_cit begin 
-		= std::lower_bound( 
+	auto begin
+		= std::lower_bound(
 			point_positions_by_y.begin()
 			, point_positions_by_y.end()
 			, topEdge
 			, utils::compare_by_y() );
 
 	const SViewportBorder& bottomEdge = d_viewportArea.getBottomEdge();
-	point_positions_cit end 
-		= std::upper_bound( 
+	auto end
+		= std::upper_bound(
 			point_positions_by_y.begin()
 			, point_positions_by_y.end()
 			, bottomEdge
 			, utils::compare_by_y() );
 
-	for ( point_positions_cit it = begin
+	for ( auto it = begin
 		; it != end
 		; ++it )
 	{
@@ -601,7 +584,7 @@ class KSelectPoints
 
 	private:
 		SRangeTreeItem* findSplitNode();
-		void traverseSubtree( SRangeTreeItem* node );
+		void traverseSubtree( SRangeTreeItem* subtreeRoot );
 		void traverseLeftSubtree(
 			SRangeTreeItem* subtreeRoot,
 			KSelectSubtreePoints* selectSubtreePoints );
@@ -632,19 +615,19 @@ KSelectPoints::KSelectPoints(
 void KSelectPoints::run()
 {
 	SRangeTreeItem* splitNode = findSplitNode();
-	if ( splitNode != 0 )
+	if ( splitNode != nullptr )
 		traverseSubtree( splitNode );
 }
 
 SRangeTreeItem* KSelectPoints::findSplitNode()
 {
-	SRangeTreeItem* result = 0;
+	SRangeTreeItem* result = nullptr;
 
 	const SViewportBorder& leftEdge = d_viewportArea.getLeftEdge();
 	const SViewportBorder& rightEdge = d_viewportArea.getRightEdge();
 
 	SRangeTreeItem* node = d_root;
-	while ( node != 0 )
+	while ( node != nullptr )
 	{
 		const SPointPos* pointPos = node->d_pointPos;
 		if ( utils::less_by_x( pointPos, leftEdge ) )
@@ -660,7 +643,7 @@ SRangeTreeItem* KSelectPoints::findSplitNode()
 			assert( utils::less_by_x( leftEdge, pointPos )
 				&& utils::less_by_x( pointPos, rightEdge ) );
 			result = node;
-			node = 0;
+			node = nullptr;
 		}
 	}
 
@@ -681,19 +664,19 @@ void KSelectPoints::traverseSubtree( SRangeTreeItem* subtreeRoot )
 	}
 }
 
-void KSelectPoints::traverseLeftSubtree( 
+void KSelectPoints::traverseLeftSubtree(
 	SRangeTreeItem* subtreeRoot,
 	KSelectSubtreePoints* selectSubtreePoints )
 {
 	SRangeTreeItem* node = subtreeRoot->getLeftChild();
 	const SViewportBorder& leftEdge = d_viewportArea.getLeftEdge();
-	while ( ( node != 0 ) && !node->isLeaf() )
+	while ( ( node != nullptr ) && !node->isLeaf() )
 	{
 		const SPointPos* pointPos = node->d_pointPos;
 		if ( utils::less_by_x( leftEdge, pointPos ) )
 		{
 			SRangeTreeItem* rightChild = node->getRightChild();
-			if ( rightChild != 0 )
+			if ( rightChild != nullptr )
 				rightChild->accept( selectSubtreePoints );
 			node = node->getLeftChild();
 		}
@@ -705,19 +688,19 @@ void KSelectPoints::traverseLeftSubtree(
 	addSectPosIfInArea( node );
 }
 
-void KSelectPoints::traverseRightSubtree( 
+void KSelectPoints::traverseRightSubtree(
 	SRangeTreeItem* subtreeRoot,
 	KSelectSubtreePoints* selectSubtreePoints )
 {
 	SRangeTreeItem* node = subtreeRoot->getRightChild();
 	const SViewportBorder& rightEdge = d_viewportArea.getRightEdge();
-	while ( ( node != 0 ) && !node->isLeaf() )
+	while ( ( node != nullptr ) && !node->isLeaf() )
 	{
 		const SPointPos* pointPos = node->d_pointPos;
 		if ( utils::less_by_x( pointPos, rightEdge ) )
 		{
 			SRangeTreeItem* leftChild = node->getLeftChild();
-			if ( leftChild != 0 )
+			if ( leftChild != nullptr )
 				leftChild->accept( selectSubtreePoints );
 			node = node->getRightChild();
 		}
@@ -731,13 +714,13 @@ void KSelectPoints::traverseRightSubtree(
 
 void KSelectPoints::addSectPosIfInArea( SRangeTreeItem* node )
 {
-	if ( ( node != 0 ) && node->isLeaf() )
+	if ( ( node != nullptr ) && node->isLeaf() )
 	{
 		const SPointPos* pointPos = node->d_pointPos;
 		const SPoint& nodePoint = pointPos->d_point;
 		if ( d_viewportArea.contains( nodePoint ) )
 		{
-			const point_pos_id_t pointid = pointPos->d_id; 
+			const point_pos_id_t pointid = pointPos->d_id;
 			d_pointids.push_back( pointid );
 		}
 	}
@@ -756,7 +739,7 @@ struct KRangeTree::Impl
 	SRangeTreeItem* d_root;
 };
 
-KRangeTree::Impl::Impl( SRangeTreeItem* root ) 
+KRangeTree::Impl::Impl( SRangeTreeItem* root )
 	: d_root( root )
 {
 }
@@ -766,13 +749,13 @@ KRangeTree::Impl::~Impl()
 	delete d_root;
 }
 
-KRangeTree::KRangeTree( const KSegmentsManager& segmentsManager ) : impl( 0 )
+KRangeTree::KRangeTree( const KSegmentsManager& segmentsManager ) : impl( nullptr )
 {
 	point_positions_t point_positions;
 	if ( segmentsManager.getPointPositions( &point_positions ) )
 	{
 		std::sort( point_positions.begin(), point_positions.end(), utils::compare_by_x() );
-		assert( std::adjacent_find( 
+		assert( std::adjacent_find(
 			point_positions.begin(), point_positions.end() ) == point_positions.end() ); // items should be unique
 		KRangeTreeBuilder treeBuilder;
 		SRangeTreeItem* root = treeBuilder.run( point_positions );
@@ -790,10 +773,10 @@ void KRangeTree::selectPoints(
 	const KViewportArea& viewportArea,
 	point_ids_t* pointids ) const
 {
-	if ( impl != 0 )
+	if ( impl != nullptr )
 	{
 		SRangeTreeItem* root = impl->d_root;
-		assert( root != 0 );
+		assert( root != nullptr );
 		KSelectPoints selectPoints( root, viewportArea, pointids );
 		selectPoints.run();
 	}

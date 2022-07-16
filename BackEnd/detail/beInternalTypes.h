@@ -25,16 +25,16 @@ enum EChildSide
 
 // ----------------------------------------------------------------------------
 
-typedef std::vector< bool > bools_t;
-typedef bools_t::iterator bools_it;
-typedef bools_t::const_iterator bools_cit;
+using bools_t = std::vector< bool >;
+using bools_it = bools_t::iterator;
+using bools_cit = bools_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 
 class id_handle_t
 {
 	public:
-		typedef std::uint32_t value_t;
+		using value_t = std::uint32_t;
 
 	protected:
 		id_handle_t() : handle(null_handle()) {}
@@ -67,28 +67,28 @@ std::ostream& operator<<(std::ostream& os, const id_handle_t& handle);
 
 struct SRawSegment
 {
-	SRawSegment( const int roadClass );
+	SRawSegment( int roadClass );
 
 	int d_roadClass;
 	points_t d_points;
 };
 
-typedef std::vector< SRawSegment > raw_segments_t;
-typedef raw_segments_t::iterator raw_segments_it;
-typedef raw_segments_t::const_iterator raw_segments_cit;
+using raw_segments_t = std::vector< SRawSegment >;
+using raw_segments_it = raw_segments_t::iterator;
+using raw_segments_cit = raw_segments_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 
 struct SRoadClass
 {
 	SRoadClass(
-		const coord_t thickness,
-		const color_t color );
+		coord_t thickness,
+		color_t color );
 	SRoadClass(
-		const coord_t thickness,
-		const color_t color,
-		const coord_t outlineThickness,
-		const color_t outlineColor );
+		coord_t thickness,
+		color_t color,
+		coord_t outlineThickness,
+		color_t outlineColor );
 
 	bool hasOutline() const;
 
@@ -101,9 +101,9 @@ struct SRoadClass
 	const coord_t d_fullThickness;
 };
 
-typedef std::vector< SRoadClass* > road_classes_t;
-typedef road_classes_t::iterator road_classes_it;
-typedef road_classes_t::const_iterator road_classes_cit;
+using road_classes_t = std::vector< SRoadClass* >;
+using road_classes_it = road_classes_t::iterator;
+using road_classes_cit = road_classes_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 
@@ -114,9 +114,9 @@ class point_pos_id_t : public id_handle_t
 		explicit point_pos_id_t(std::uint64_t handle) : id_handle_t(handle) {}
 };
 
-typedef std::vector< point_pos_id_t > point_ids_t;
-typedef point_ids_t::iterator point_ids_it;
-typedef point_ids_t::const_iterator point_ids_cit;
+using point_ids_t = std::vector< point_pos_id_t >;
+using point_ids_it = point_ids_t::iterator;
+using point_ids_cit = point_ids_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 
@@ -131,15 +131,15 @@ struct SPointPos
 
 };
 
-typedef std::vector< const SPointPos* > point_positions_t;
-typedef point_positions_t::iterator point_positions_it;
-typedef point_positions_t::const_iterator point_positions_cit;
+using point_positions_t = std::vector< const SPointPos* >;
+using point_positions_it = point_positions_t::iterator;
+using point_positions_cit = point_positions_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 
-typedef std::vector< SPointPos > segment_points_t;
-typedef segment_points_t::iterator segment_points_it;
-typedef segment_points_t::const_iterator segment_points_cit;
+using segment_points_t = std::vector< SPointPos >;
+using segment_points_it = segment_points_t::iterator;
+using segment_points_cit = segment_points_t::const_iterator;
 
 struct SSegment
 {
@@ -149,9 +149,9 @@ struct SSegment
 	segment_points_t d_points;
 };
 
-typedef std::vector< SSegment > segments_t;
-typedef segments_t::iterator segments_it;
-typedef segments_t::const_iterator segments_cit;
+using segments_t = std::vector< SSegment >;
+using segments_it = segments_t::iterator;
+using segments_cit = segments_t::const_iterator;
 
 class segment_id_t : public id_handle_t
 {
@@ -170,9 +170,9 @@ class section_id_t : public id_handle_t
 		explicit section_id_t(std::uint64_t handle) : id_handle_t(handle) {}
 };
 
-typedef std::vector< section_id_t > section_ids_t;
-typedef section_ids_t::iterator section_ids_it;
-typedef section_ids_t::const_iterator section_ids_cit;
+using section_ids_t = std::vector< section_id_t >;
+using section_ids_it = section_ids_t::iterator;
+using section_ids_cit = section_ids_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 
@@ -183,9 +183,9 @@ class sect_pos_id_t : public id_handle_t
 		explicit sect_pos_id_t(std::uint64_t handle) : id_handle_t(handle) {}
 };
 
-typedef std::vector< sect_pos_id_t > sect_pos_ids_t;
-typedef sect_pos_ids_t::iterator sect_pos_ids_it;
-typedef sect_pos_ids_t::const_iterator sect_pos_ids_cit;
+using sect_pos_ids_t = std::vector< sect_pos_id_t >;
+using sect_pos_ids_it = sect_pos_ids_t::iterator;
+using sect_pos_ids_cit = sect_pos_ids_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 
@@ -200,9 +200,9 @@ struct SSectionPos
 
 };
 
-typedef std::vector< const SSectionPos* > section_positions_t;
-typedef section_positions_t::iterator section_positions_it;
-typedef section_positions_t::const_iterator section_positions_cit;
+using section_positions_t = std::vector< const SSectionPos* >;
+using section_positions_it = section_positions_t::iterator;
+using section_positions_cit = section_positions_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 
@@ -213,16 +213,16 @@ struct SIntervalSection
 		const SSectionPos& begin,
 		const SSectionPos& end );
 
-	bool hasOrientation( const EOrientation orientation ) const;
+	bool hasOrientation( EOrientation orientation ) const;
 
 	section_id_t d_sectid;
 	SSectionPos d_begin;
 	SSectionPos d_end;
 };
 
-typedef std::vector< SIntervalSection > interval_sections_t;
-typedef interval_sections_t::iterator interval_sections_it;
-typedef interval_sections_t::const_iterator interval_sections_cit;
+using interval_sections_t = std::vector< SIntervalSection >;
+using interval_sections_it = interval_sections_t::iterator;
+using interval_sections_cit = interval_sections_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 
@@ -233,9 +233,9 @@ class interval_section_id_t : public id_handle_t
 		explicit interval_section_id_t(std::uint64_t handle) : id_handle_t(handle) {}
 };
 
-typedef std::vector< interval_section_id_t > interval_section_ids_t;
-typedef interval_section_ids_t::iterator interval_section_ids_it;
-typedef interval_section_ids_t::const_iterator interval_section_ids_cit;
+using interval_section_ids_t = std::vector< interval_section_id_t >;
+using interval_section_ids_it = interval_section_ids_t::iterator;
+using interval_section_ids_cit = interval_section_ids_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 

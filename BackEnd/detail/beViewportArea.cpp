@@ -31,10 +31,6 @@ KViewportArea::KViewportArea( const SRect& rect )
 {
 }
 
-KViewportArea::~KViewportArea()
-{
-}
-
 // ----------------------------------------------------------------------------
 
 const SViewportBorder& KViewportArea::getLeftEdge() const

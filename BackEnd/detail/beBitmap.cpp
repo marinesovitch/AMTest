@@ -5,8 +5,4 @@
 namespace be
 {
 
-IBitmap::~IBitmap()
-{
-}
-
 } // namespace be

@@ -16,9 +16,9 @@ const std::size_t IsBeginOrEndOfSectionFlagMask = 0x1;
 
 // ----------------------------------------------------------------------------
 
-inline point_pos_id_t composePointPosId( 
-	const std::size_t segmentIndex, 
-	const std::size_t pointIndex )
+inline point_pos_id_t composePointPosId(
+	std::size_t segmentIndex,
+	std::size_t pointIndex )
 {
 	assert( segmentIndex <= consts::MaxSegmentId );
 	assert( pointIndex <= consts::MaxPointPosId );
@@ -27,9 +27,9 @@ inline point_pos_id_t composePointPosId(
 	return result;
 }
 
-inline void decomposePointPosId( 
+inline void decomposePointPosId(
 	const point_pos_id_t pointId,
-	std::size_t* segmentIndex, 
+	std::size_t* segmentIndex,
 	std::size_t* pointIndex )
 {
 	const std::size_t rawPointPosId = pointId.get();
@@ -41,19 +41,19 @@ inline void decomposePointPosId(
 
 // ----------------------------------------------------------------------------
 
-inline sect_pos_id_t composeSectPosId( 
-	const std::size_t intervalSectionIndex,
-	const bool isEndOfSection )
+inline sect_pos_id_t composeSectPosId(
+	std::size_t intervalSectionIndex,
+	bool isEndOfSection )
 {
 	assert( intervalSectionIndex <= consts::MaxIntervalSectionId );
-	const std::size_t rawSectPosId 
+	const std::size_t rawSectPosId
 		= ( intervalSectionIndex << consts::BitsForIsBeginOrEndOfSectionFlag )
 		+ ( isEndOfSection ? 1 : 0 );
 	const sect_pos_id_t result( rawSectPosId );
 	return result;
 }
 
-inline void decomposeSectPosId( 
+inline void decomposeSectPosId(
 	const sect_pos_id_t sectPosId,
 	std::size_t* intervalSectionIndex,
 	bool* isEndOfSection )
@@ -64,7 +64,7 @@ inline void decomposeSectPosId(
 	assert( *intervalSectionIndex <= consts::MaxIntervalSectionId );
 }
 
-inline std::size_t sectPosId2intervalSectionIndex( 
+inline std::size_t sectPosId2intervalSectionIndex(
 	const sect_pos_id_t sectPosId )
 {
 	const std::size_t rawSectionId = sectPosId.get();
@@ -75,9 +75,9 @@ inline std::size_t sectPosId2intervalSectionIndex(
 
 // ----------------------------------------------------------------------------
 
-inline section_id_t composeSectionId( 
-	const std::size_t segmentIndex, 
-	const std::size_t sectionIndex )
+inline section_id_t composeSectionId(
+	std::size_t segmentIndex,
+	std::size_t sectionIndex )
 {
 	assert( segmentIndex <= consts::MaxSegmentId );
 	assert( sectionIndex <= consts::MaxSectionId );
@@ -87,9 +87,9 @@ inline section_id_t composeSectionId(
 	return result;
 }
 
-inline void decomposeSectionId( 
+inline void decomposeSectionId(
 	const section_id_t sectionId,
-	std::size_t* segmentIndex, 
+	std::size_t* segmentIndex,
 	std::size_t* sectionIndex )
 {
 	const std::size_t rawSectionId = sectionId.get();
@@ -118,7 +118,7 @@ struct sort_by_road_class
 class KSegmentsCreator
 {
 	public:
-		KSegmentsCreator( 
+		KSegmentsCreator(
 			const road_classes_t& roadClasses,
 			segments_t* segments );
 
@@ -126,12 +126,12 @@ class KSegmentsCreator
 		bool run( raw_segments_t* segments );
 
 	private:
-		void initSegments( 
+		void initSegments(
 			const raw_segments_t& rawSegments );
-		void addSegment( 
+		void addSegment(
 			const SRawSegment& rawSegment );
-		void addSegmentPoints( 
-			const points_t& rawPoints, 
+		void addSegmentPoints(
+			const points_t& rawPoints,
 			segment_points_t* segmentPoints );
 
 	private:
@@ -143,7 +143,7 @@ class KSegmentsCreator
 
 // ----------------------------------------------------------------------------
 
-KSegmentsCreator::KSegmentsCreator( 
+KSegmentsCreator::KSegmentsCreator(
 	const road_classes_t& roadClasses,
 	segments_t* segments )
 	: d_roadClasses( roadClasses )
@@ -157,11 +157,11 @@ bool KSegmentsCreator::run( raw_segments_t* rawSegments )
 	d_segments->reserve( rawSegments->size() );
 
 	/*
-		sort by road class - at drawing the most important roads will be 
+		sort by road class - at drawing the most important roads will be
 		painted at the end (over less important)
 
-		CAUTION! sort it before initSegments, else indexes will be 
-		corrupted !!! 
+		CAUTION! sort it before initSegments, else indexes will be
+		corrupted !!!
 	*/
 	std::sort( rawSegments->begin(), rawSegments->end(), sort_by_road_class() );
 
@@ -173,7 +173,7 @@ bool KSegmentsCreator::run( raw_segments_t* rawSegments )
 
 void KSegmentsCreator::initSegments( const raw_segments_t& rawSegments )
 {
-	for ( raw_segments_cit it = rawSegments.begin()
+	for ( auto it = rawSegments.begin()
 		; it != rawSegments.end()
 		; ++it, ++d_segmentIndex )
 	{
@@ -194,8 +194,8 @@ void KSegmentsCreator::addSegment( const SRawSegment& rawSegment )
 	addSegmentPoints( rawPoints, segmentPoints );
 }
 
-void KSegmentsCreator::addSegmentPoints( 
-	const points_t& rawPoints, 
+void KSegmentsCreator::addSegmentPoints(
+	const points_t& rawPoints,
 	segment_points_t* segmentPoints )
 {
 	const std::size_t pointsCount = rawPoints.size();
@@ -203,7 +203,7 @@ void KSegmentsCreator::addSegmentPoints(
 	segmentPoints->reserve( pointsCount );
 
 	std::size_t pointIndex = 0;
-	for ( points_cit it = rawPoints.begin()
+	for ( auto it = rawPoints.begin()
 		; it != rawPoints.end()
 		; ++it, ++pointIndex )
 	{
@@ -220,26 +220,26 @@ void KSegmentsCreator::addSegmentPoints(
 class KIntervalSectionsCreator
 {
 	public:
-		KIntervalSectionsCreator( interval_sections_t* intervalSections );
+		explicit KIntervalSectionsCreator( interval_sections_t* intervalSections );
 
 	public:
 		void run( const segments_t& segments );
 
 	private:
 		void resetContext();
-		void traverseSegment( 
+		void traverseSegment(
 			const SSegment& segment );
 		void addIntervalSections();
 		void addHorizontalSection(
-			const coord_t raw_x0, 
-			const coord_t raw_x1,	
-			const coord_t y );
+			coord_t raw_x0,
+			coord_t raw_x1,
+			coord_t y );
 		void addVerticalSection(
-			const coord_t y0,
-			const coord_t y1,
-			const coord_t x );
-		sect_pos_id_t generateSectPosId( 
-			const bool isEndOfSection ) const;
+			coord_t y0,
+			coord_t y1,
+			coord_t x );
+		sect_pos_id_t generateSectPosId(
+			bool isEndOfSection ) const;
 
 	private:
 		std::size_t d_segmentIndex;
@@ -253,18 +253,18 @@ class KIntervalSectionsCreator
 
 // ----------------------------------------------------------------------------
 
-KIntervalSectionsCreator::KIntervalSectionsCreator( 
+KIntervalSectionsCreator::KIntervalSectionsCreator(
 	interval_sections_t* intervalSections )
 	: d_segmentIndex( 0 )
 	, d_intervalSections( intervalSections )
-	, d_beginSectionPoint( 0 )
-	, d_endSectionPoint( 0 )
+	, d_beginSectionPoint( nullptr )
+	, d_endSectionPoint( nullptr )
 {
 }
 
 void KIntervalSectionsCreator::run( const segments_t& segments )
 {
-	for ( segments_cit it = segments.begin()
+	for ( auto it = segments.begin()
 		; it != segments.end()
 		; ++it, ++d_segmentIndex )
 	{
@@ -277,19 +277,19 @@ void KIntervalSectionsCreator::run( const segments_t& segments )
 void KIntervalSectionsCreator::resetContext()
 {
 	d_sectid.reset();
-	d_beginSectionPoint = d_endSectionPoint = 0;
+	d_beginSectionPoint = d_endSectionPoint = nullptr;
 }
 
 void KIntervalSectionsCreator::traverseSegment( const SSegment& segment )
 {
 	const segment_points_t& points = segment.d_points;
 	assert( !points.empty() );
-	for ( segment_points_cit it = points.begin()
+	for ( auto it = points.begin()
 		; it != points.end()
 		; ++it )
 	{
 		const SPointPos& segmentPos = *it;
-		if ( d_beginSectionPoint == 0 )
+		if ( d_beginSectionPoint == nullptr )
 		{
 			d_beginSectionPoint = &segmentPos.d_point;
 		}
@@ -335,12 +335,12 @@ void KIntervalSectionsCreator::addIntervalSections()
 	}
 }
 
-void KIntervalSectionsCreator::addHorizontalSection( 
-	const coord_t raw_x0, 
-	const coord_t raw_x1,	
-	const coord_t y )
+void KIntervalSectionsCreator::addHorizontalSection(
+	coord_t raw_x0,
+	coord_t raw_x1,
+	coord_t y )
 {
-	coord_t x0 = raw_x0; 
+	coord_t x0 = raw_x0;
 	coord_t x1 = raw_x1;
 
 	// begin coord should always be less than end one
@@ -357,17 +357,17 @@ void KIntervalSectionsCreator::addHorizontalSection(
 	const SPoint endPoint( x1, y );
 	const SSectionPos endSectionPos( endSectPosId, endPoint );
 
-	const SIntervalSection intervalSection( 
+	const SIntervalSection intervalSection(
 		d_sectid, beginSectionPos, endSectionPos );
 	d_intervalSections->push_back( intervalSection );
 }
-	
+
 void KIntervalSectionsCreator::addVerticalSection(
-	const coord_t raw_y0, 
-	const coord_t raw_y1,	
-	const coord_t x )
+	coord_t raw_y0,
+	coord_t raw_y1,
+	coord_t x )
 {
-	coord_t y0 = raw_y0; 
+	coord_t y0 = raw_y0;
 	coord_t y1 = raw_y1;
 
 	// begin coord should always be less than end one
@@ -384,12 +384,12 @@ void KIntervalSectionsCreator::addVerticalSection(
 	const SPoint endPoint( x, y1 );
 	const SSectionPos endSectionPos( endSectPosId, endPoint );
 
-	const SIntervalSection intervalSection( 
+	const SIntervalSection intervalSection(
 		d_sectid, beginSectionPos, endSectionPos );
 	d_intervalSections->push_back( intervalSection );
 }
 
-sect_pos_id_t KIntervalSectionsCreator::generateSectPosId( 
+sect_pos_id_t KIntervalSectionsCreator::generateSectPosId(
 	const bool isEndOfSection ) const
 {
 	const std::size_t intervalSectionIndex = d_intervalSections->size();
@@ -400,10 +400,10 @@ sect_pos_id_t KIntervalSectionsCreator::generateSectPosId(
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-class KSectionCollector 
+class KSectionCollector
 {
 	protected:
-		KSectionCollector( 
+		KSectionCollector(
 			const KSegmentsManager& segmentsManager,
 			const SRect& viewportRect,
 			const segments_t& segments,
@@ -411,20 +411,20 @@ class KSectionCollector
 			section_ids_t* sections );
 
 	public:
-		virtual ~KSectionCollector();
+		virtual ~KSectionCollector() = default;
 
 	protected:
-		void preparePoint( const point_pos_id_t pointid );
+		void preparePoint( point_pos_id_t pointid );
 
-		void storeSection( 
-			const std::size_t segmentIndex, 
-			const std::size_t sectionIndex );
-		void storeSection( 
+		void storeSection(
+			std::size_t segmentIndex,
+			std::size_t sectionIndex );
+		void storeSection(
 			const SIntervalSection& intervalSection );
-		void storeSection( 
-			const section_id_t sectid );
+		void storeSection(
+			section_id_t sectid );
 
-		bool doesSectionCrossViewport( 
+		bool doesSectionCrossViewport(
 			const SIntervalSection& intervalSection ) const;
 
 		bool uniqueSections();
@@ -440,7 +440,7 @@ class KSectionCollector
 
 // ----------------------------------------------------------------------------
 
-KSectionCollector::KSectionCollector( 
+KSectionCollector::KSectionCollector(
 	const KSegmentsManager& segmentsManager,
 	const SRect& viewportRect,
 	const segments_t& segments,
@@ -454,11 +454,7 @@ KSectionCollector::KSectionCollector(
 {
 }
 
-KSectionCollector::~KSectionCollector()
-{
-}
-
-void KSectionCollector::preparePoint( const point_pos_id_t pointid )
+void KSectionCollector::preparePoint( point_pos_id_t pointid )
 {
 	std::size_t segmentIndex;
 	std::size_t pointIndex;
@@ -485,9 +481,9 @@ void KSectionCollector::preparePoint( const point_pos_id_t pointid )
 	}
 }
 
-void KSectionCollector::storeSection( 
-	const std::size_t segmentIndex, 
-	const std::size_t sectionIndex )
+void KSectionCollector::storeSection(
+	std::size_t segmentIndex,
+	std::size_t sectionIndex )
 {
 	const section_id_t sectid = composeSectionId( segmentIndex, sectionIndex );
 	storeSection( sectid );
@@ -499,12 +495,12 @@ void KSectionCollector::storeSection( const SIntervalSection& intervalSection )
 	storeSection( sectid );
 }
 
-void KSectionCollector::storeSection( const section_id_t sectid )
+void KSectionCollector::storeSection( section_id_t sectid )
 {
 	d_sections->push_back( sectid );
 }
 
-bool KSectionCollector::doesSectionCrossViewport( 
+bool KSectionCollector::doesSectionCrossViewport(
 	const SIntervalSection& intervalSection ) const
 {
 	bool result = false;
@@ -514,7 +510,7 @@ bool KSectionCollector::doesSectionCrossViewport(
 	{
 		result = true;
 	}
-	else 
+	else
 	{
 		const coord_t left = d_viewportRect.left;
 		const coord_t top = d_viewportRect.top;
@@ -529,7 +525,7 @@ bool KSectionCollector::doesSectionCrossViewport(
 		if ( intervalSection.hasOrientation( Horizontal ) )
 		{
 			assert( y0 == y1 );
-			if ( ( x0 <= left ) && ( left <= x1 ) 
+			if ( ( x0 <= left ) && ( left <= x1 )
 				&& ( top <= y0 ) && ( y0 <= bottom ) )
 			{
 				result = true;
@@ -539,7 +535,7 @@ bool KSectionCollector::doesSectionCrossViewport(
 		{
 			assert( intervalSection.hasOrientation( Vertical ) );
 			assert( x0 == x1 );
-			if ( ( y0 <= top ) && ( top <= y1 ) 
+			if ( ( y0 <= top ) && ( top <= y1 )
 				&& ( left <= x0 ) && ( x0 <= right ) )
 			{
 				result = true;
@@ -555,7 +551,7 @@ bool KSectionCollector::doesSectionCrossViewport(
 			if ( ( x < left ) && ( y < top ) )
 			{
 				const sect_pos_id_t sectposid = intervalSection.d_begin.d_id;
-				const SPoint& sectionRectRightBottomCorner 
+				const SPoint& sectionRectRightBottomCorner
 					= d_segmentsManager.getSectionCrossPoint( sectposid );
 				if ( ( right < sectionRectRightBottomCorner.x ) && ( bottom < sectionRectRightBottomCorner.y ) )
 					result = true;
@@ -569,7 +565,7 @@ bool KSectionCollector::doesSectionCrossViewport(
 bool KSectionCollector::uniqueSections()
 {
 	std::sort( d_sections->begin(), d_sections->end());
-	section_ids_it it_new_end = std::unique( d_sections->begin(), d_sections->end() );
+	auto it_new_end = std::unique( d_sections->begin(), d_sections->end() );
 	d_sections->erase( it_new_end, d_sections->end() );
 	const bool result = !d_sections->empty();
 	return result;
@@ -581,7 +577,7 @@ bool KSectionCollector::uniqueSections()
 class KPrepareSections : public KSectionCollector
 {
 	public:
-		KPrepareSections( 
+		KPrepareSections(
 			const KSegmentsManager& segmentsManager,
 			const SRect& viewportRect,
 			const segments_t& segments,
@@ -597,13 +593,13 @@ class KPrepareSections : public KSectionCollector
 		void preparePoints( const point_ids_t& pointids );
 
 		void prepareSectPositions( const sect_pos_ids_t& sectposids );
-		void prepareSectPos( const sect_pos_id_t sectposid );
+		void prepareSectPos( sect_pos_id_t sectposid );
 
 };
 
 // ----------------------------------------------------------------------------
 
-KPrepareSections::KPrepareSections( 
+KPrepareSections::KPrepareSections(
 	const KSegmentsManager& segmentsManager,
 	const SRect& viewportRect,
 	const segments_t& segments,
@@ -625,29 +621,23 @@ bool KPrepareSections::run(
 
 void KPrepareSections::preparePoints( const point_ids_t& pointids )
 {
-	for ( point_ids_cit it = pointids.begin()
-		; it != pointids.end()
-		; ++it )
+	for ( const point_pos_id_t& pointid : pointids )
 	{
-		const point_pos_id_t pointid = *it;
 		preparePoint( pointid );
 	}
 }
 
 void KPrepareSections::prepareSectPositions( const sect_pos_ids_t& sectposids )
 {
-	for ( sect_pos_ids_cit it = sectposids.begin()
-		; it != sectposids.end()
-		; ++it )
+	for ( const sect_pos_id_t& sectposid : sectposids )
 	{
-		const sect_pos_id_t sectposid = *it;
 		prepareSectPos( sectposid );
 	}
 }
 
-void KPrepareSections::prepareSectPos( const sect_pos_id_t sectposid )
+void KPrepareSections::prepareSectPos( sect_pos_id_t sectposid )
 {
-	const std::size_t intervalSectionIndex 
+	const std::size_t intervalSectionIndex
 		= sectPosId2intervalSectionIndex( sectposid );
 	const SIntervalSection& intervalSection = d_intervalSections[ intervalSectionIndex ];
 	assert( doesSectionCrossViewport( intervalSection ) );
@@ -661,7 +651,7 @@ void KPrepareSections::prepareSectPos( const sect_pos_id_t sectposid )
 class KBruteForceSelectSections : public KSectionCollector
 {
 	public:
-		KBruteForceSelectSections( 
+		KBruteForceSelectSections(
 			const KSegmentsManager& segmentsManager,
 			const SRect& viewportRect,
 			const segments_t& segments,
@@ -682,7 +672,7 @@ class KBruteForceSelectSections : public KSectionCollector
 
 // ----------------------------------------------------------------------------
 
-KBruteForceSelectSections::KBruteForceSelectSections( 
+KBruteForceSelectSections::KBruteForceSelectSections(
 	const KSegmentsManager& segmentsManager,
 	const SRect& viewportRect,
 	const segments_t& segments,
@@ -703,11 +693,8 @@ void KBruteForceSelectSections::run()
 
 void KBruteForceSelectSections::gatherPointIds()
 {
-	for ( segments_cit it = d_segments.begin()
-		; it != d_segments.end()
-		; ++it )
+	for ( const SSegment& segment : d_segments )
 	{
-		const SSegment& segment = *it;
 		traverseSegment( segment );
 	}
 }
@@ -715,11 +702,8 @@ void KBruteForceSelectSections::gatherPointIds()
 void KBruteForceSelectSections::traverseSegment( const SSegment& segment )
 {
 	const segment_points_t& points = segment.d_points;
-	for ( segment_points_cit pit = points.begin()
-		; pit != points.end()
-		; ++pit )
+	for ( const SPointPos& pointPos : points )
 	{
-		const SPointPos& pointPos = *pit;
 		preparePointPos( pointPos );
 	}
 }
@@ -736,11 +720,8 @@ void KBruteForceSelectSections::preparePointPos( const SPointPos& pointPos )
 
 void KBruteForceSelectSections::gatherIntervalSectionIds()
 {
-	for ( interval_sections_cit it = d_intervalSections.begin()
-		; it != d_intervalSections.end()
-		; ++it )
+	for ( const SIntervalSection& intervalSection : d_intervalSections )
 	{
-		const SIntervalSection& intervalSection = *it;
 		if ( doesSectionCrossViewport( intervalSection ) )
 			storeSection( intervalSection );
 	}
@@ -751,10 +732,6 @@ void KBruteForceSelectSections::gatherIntervalSectionIds()
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
-
-KSegmentsManager::KSegmentsManager()
-{
-}
 
 KSegmentsManager::~KSegmentsManager()
 {
@@ -777,17 +754,11 @@ std::size_t KSegmentsManager::maxSegmentPointsCount()
 
 bool KSegmentsManager::getPointPositions( point_positions_t* point_positions ) const
 {
-	for ( segments_cit it = d_segments.begin()
-		; it != d_segments.end()
-		; ++it )
+	for ( const SSegment& segment : d_segments )
 	{
-		const SSegment& segment = *it;
 		const segment_points_t& points = segment.d_points;
-		for ( segment_points_cit pit = points.begin()
-			; pit != points.end()
-			; ++pit )
+		for ( const SPointPos& pointPos : points )
 		{
-			const SPointPos& pointPos = *pit;
 			point_positions->push_back( &pointPos );
 		}
 	}
@@ -798,15 +769,12 @@ bool KSegmentsManager::getPointPositions( point_positions_t* point_positions ) c
 
 // ----------------------------------------------------------------------------
 
-bool KSegmentsManager::getSectPositions( 
+bool KSegmentsManager::getSectPositions(
 	const EOrientation orientation,
 	section_positions_t* sect_positions ) const
 {
-	for ( interval_sections_cit it = d_intervalSections.begin()
-		; it != d_intervalSections.end()
-		; ++it )
+	for ( const SIntervalSection& section : d_intervalSections )
 	{
-		const SIntervalSection& section = *it;
 		if ( section.hasOrientation( orientation ) )
 		{
 			const SSectionPos& beginSectPos = section.d_begin;
@@ -821,7 +789,7 @@ bool KSegmentsManager::getSectPositions(
 	return result;
 }
 
-const SSectionPos* KSegmentsManager::getSectionPos( const sect_pos_id_t sectposid ) const
+const SSectionPos* KSegmentsManager::getSectionPos( sect_pos_id_t sectposid ) const
 {
 	std::size_t intervalSectionIndex;
 	bool isEndOfsection;
@@ -837,7 +805,7 @@ const SSectionPos* KSegmentsManager::getSectionBeginPos( const SSectionPos* sect
 	std::size_t rawSectPosId = sectPosId.get();
 	rawSectPosId &= ~IsBeginOrEndOfSectionFlagMask;
 	const sect_pos_id_t beginSectPosId( rawSectPosId );
-	const SSectionPos* result 
+	const SSectionPos* result
 		= ( beginSectPosId == sectPosId ) ? sectpos : getSectionPos( beginSectPosId );
 	return result;
 }
@@ -848,12 +816,12 @@ const SSectionPos* KSegmentsManager::getSectionEndPos( const SSectionPos* sectpo
 	std::size_t rawSectPosId = sectPosId.get();
 	rawSectPosId |= IsBeginOrEndOfSectionFlagMask;
 	const sect_pos_id_t endSectPosId( rawSectPosId );
-	const SSectionPos* result 
+	const SSectionPos* result
 		= ( endSectPosId == sectPosId ) ? sectpos : getSectionPos( endSectPosId );
 	return result;
 }
 
-SPoint KSegmentsManager::getSectionCrossPoint( const sect_pos_id_t sectposid ) const
+SPoint KSegmentsManager::getSectionCrossPoint( sect_pos_id_t sectposid ) const
 {
 	std::size_t intervalSectionIndex;
 	bool isEndOfsection;
@@ -873,8 +841,8 @@ SPoint KSegmentsManager::getSectionCrossPoint( const sect_pos_id_t sectposid ) c
 	return result;
 }
 
-bool KSegmentsManager::isSection( 
-	const SSectionPos* beginSectPos, 
+bool KSegmentsManager::isSection(
+	const SSectionPos* beginSectPos,
 	const SSectionPos* endSectPos )
 {
 	const sect_pos_id_t firstSectPosId = beginSectPos->d_id;
@@ -904,11 +872,11 @@ void KSegmentsManager::init( raw_segments_t* rawSegments )
 	}
 }
 
-void KSegmentsManager::getSection( 
+void KSegmentsManager::getSection(
 	const section_id_t sectid,
 	SSection* section ) const
 {
-	std::size_t segmentIndex; 
+	std::size_t segmentIndex;
 	std::size_t sectionIndex;
 	decomposeSectionId( sectid, &segmentIndex, &sectionIndex );
 
@@ -948,7 +916,7 @@ bool KSegmentsManager::compareBruteForceSelectSections(
 	bool result = true;
 	#ifdef BRUTE_FORCE_SELECT_SECTIONS_CHECKER
 	section_ids_t bfSections;
-	KBruteForceSelectSections bruteForceSelectSections( 
+	KBruteForceSelectSections bruteForceSelectSections(
 		*this, viewportRect, d_segments, d_intervalSections, &bfSections );
 	bruteForceSelectSections.run();
 

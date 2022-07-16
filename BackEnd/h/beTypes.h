@@ -6,22 +6,22 @@ namespace be
 {
 
 #ifdef ANDROID
-typedef short color_t;
+using color_t = short;
 #else
-typedef int color_t;
+using color_t = int;
 #endif
 
-typedef int color32_t;
+using color32_t = int;
 
-typedef int coord_t;
+using coord_t = int;
 
 // ----------------------------------------------------------------------------
 
 struct SSize
 {
 	SSize(
-		const coord_t width = 0,
-		const coord_t height = 0 );
+		coord_t width = 0,
+		coord_t height = 0 );
 
 	bool operator!=( const SSize& rhs ) const;
 
@@ -34,8 +34,8 @@ struct SSize
 struct SPoint
 {
 	SPoint(
-		const coord_t x = 0,
-		const coord_t y = 0 );
+		coord_t x = 0,
+		coord_t y = 0 );
 
 	bool operator==( const SPoint& rhs ) const;
 	bool operator!=( const SPoint& rhs ) const;
@@ -46,19 +46,19 @@ struct SPoint
 	coord_t y;
 };
 
-typedef std::vector< SPoint > points_t;
-typedef points_t::iterator points_it;
-typedef points_t::const_iterator points_cit;
+using points_t = std::vector< SPoint >;
+using points_it = points_t::iterator;
+using points_cit = points_t::const_iterator;
 
 // ----------------------------------------------------------------------------
 
 struct SRect
 {
 	SRect(
-		const coord_t left = 0,
-		const coord_t top = 0,
-		const coord_t right = 0,
-		const coord_t bottom = 0 );
+		coord_t left = 0,
+		coord_t top = 0,
+		coord_t right = 0,
+		coord_t bottom = 0 );
 	SRect(
 		const SPoint& topLeft,
 		const SSize& size );
@@ -67,17 +67,17 @@ struct SRect
 
 	bool operator!=( const SRect& rhs ) const;
 
-	const SPoint getCenter() const;
-	const SPoint getTopLeft() const;
-	const SPoint getBottomRight() const;
+	SPoint getCenter() const;
+	SPoint getTopLeft() const;
+	SPoint getBottomRight() const;
 
-	const SSize getSize() const;
+	SSize getSize() const;
 
 	bool contains( const SPoint& pt ) const;
 	bool isOnEdge( const SPoint& pt ) const;
 
 	coord_t left;
-	coord_t top; 
+	coord_t top;
 	coord_t right;
 	coord_t bottom;
 };
@@ -96,7 +96,7 @@ enum EDirection
 struct SMoveData
 {
 	SMoveData( const SPoint& focusScreenPoint );
-	SMoveData( const EDirection direction );
+	SMoveData( EDirection direction );
 	SMoveData( const SSize& delta );
 
 	enum EKind
@@ -122,10 +122,10 @@ struct SZoomData
 		ZoomOut
 	};
 
-	SZoomData( 
-		const EKind kind, 
-		const int delta,
-		const bool zoomInPlace,
+	SZoomData(
+		EKind kind,
+		int delta,
+		bool zoomInPlace,
 		const be::SPoint& focusScreenPoint );
 
 	const EKind d_kind;

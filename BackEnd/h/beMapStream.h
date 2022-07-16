@@ -14,7 +14,7 @@ struct IMapStream
 		static IMapStream* create();
 
 	public:
-		virtual ~IMapStream();
+		virtual ~IMapStream() = default;
 
 	public:
 		virtual bool getInt( int* value ) = 0;

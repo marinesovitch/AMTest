@@ -19,7 +19,7 @@ std::ostream& operator<<(std::ostream& os, const id_handle_t& handle)
 
 // ----------------------------------------------------------------------------
 
-SRawSegment::SRawSegment( const int roadClass )
+SRawSegment::SRawSegment( int roadClass )
 	: d_roadClass( roadClass )
 {
 }
@@ -27,8 +27,8 @@ SRawSegment::SRawSegment( const int roadClass )
 // ----------------------------------------------------------------------------
 
 SRoadClass::SRoadClass(
-	const coord_t thickness,
-	const color_t color )
+	coord_t thickness,
+	color_t color )
 	: d_thickness( thickness )
 	, d_color( color )
 	, d_outlineThickness( 0 )
@@ -39,10 +39,10 @@ SRoadClass::SRoadClass(
 }
 
 SRoadClass::SRoadClass(
-	const coord_t thickness,
-	const color_t color,
-	const coord_t outlineThickness,
-	const color_t outlineColor )
+	coord_t thickness,
+	color_t color,
+	coord_t outlineThickness,
+	color_t outlineColor )
 	: d_thickness( thickness )
 	, d_color( color )
 	, d_outlineThickness( outlineThickness )
@@ -97,7 +97,7 @@ SIntervalSection::SIntervalSection(
 {
 }
 
-bool SIntervalSection::hasOrientation( const EOrientation orientation ) const
+bool SIntervalSection::hasOrientation( EOrientation orientation ) const
 {
 	bool result = false;
 	if ( orientation == Horizontal )
@@ -122,8 +122,8 @@ bool SIntervalSection::hasOrientation( const EOrientation orientation ) const
 
 SSection::SSection()
 	: d_roadClassIndex( 0 )
-	, d_begin( 0 )
-	, d_end( 0 )
+	, d_begin( nullptr )
+	, d_end( nullptr )
 {
 }
 
