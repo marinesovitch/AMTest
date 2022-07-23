@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #ifndef INC_BE_DIAGNOSTICS_H
 #define INC_BE_DIAGNOSTICS_H
 
@@ -20,7 +20,7 @@ void dumpRect( const SRect& rect );
 
 void dumpView( const SViewData& viewData );
 
-void dumpSections( 
+void dumpSections(
 	const IInternalDocument* document,
 	const section_ids_t& sections );
 

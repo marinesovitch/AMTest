@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #include "ph.h"
 #include "beConsts.h"
 
@@ -8,7 +8,7 @@ namespace be
 namespace consts
 {
 
-color_t RoadClassColors[ MaxRoadClassIndex + 1 ] = 
+color_t RoadClassColors[ MaxRoadClassIndex + 1 ] =
 	{ MAKERGB(246,242,189)
 	, MAKERGB(192,192,192)
 	, MAKERGB(255,255,67)

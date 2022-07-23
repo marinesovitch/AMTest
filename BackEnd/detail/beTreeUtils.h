@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #ifndef INC_BE_TREE_UTILS_H
 #define INC_BE_TREE_UTILS_H
 
@@ -11,21 +11,21 @@ namespace be
 namespace utils
 {
 
-bool cmp_less_by_x( 
-	const SPoint& lhs, 
+bool cmp_less_by_x(
+	const SPoint& lhs,
 	const SPoint& rhs,
 	const bool resultIfEqual );
 
-bool cmp_less_by_y( 
-	const SPoint& lhs, 
+bool cmp_less_by_y(
+	const SPoint& lhs,
 	const SPoint& rhs,
 	const bool resultIfEqual );
 
 // ----------------------------------------------------------------------------
 
 template< typename position_t >
-bool less_by_x( 
-	const position_t lhs, 
+bool less_by_x(
+	const position_t lhs,
 	const position_t rhs )
 {
 	const SPoint& lpt = lhs->d_point;
@@ -48,8 +48,8 @@ bool less_by_x(
 }
 
 template< typename position_t >
-bool less_by_x( 
-	const position_t lhs, 
+bool less_by_x(
+	const position_t lhs,
 	const SViewportBorder& edge )
 {
 	const SPoint& lpt = lhs->d_point;
@@ -62,8 +62,8 @@ bool less_by_x(
 // ----------------------------------------------------------------------------
 
 template< typename position_t >
-bool less_by_y( 
-	const position_t lhs, 
+bool less_by_y(
+	const position_t lhs,
 	const position_t rhs )
 {
 	const SPoint& lpt = lhs->d_point;
@@ -86,8 +86,8 @@ bool less_by_y(
 }
 
 template< typename position_t >
-bool less_by_y( 
-	const position_t lhs, 
+bool less_by_y(
+	const position_t lhs,
 	const SViewportBorder& edge )
 {
 	const SPoint& lpt = lhs->d_point;

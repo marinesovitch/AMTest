@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #ifndef INC_FE_VIEW_H
 #define INC_FE_VIEW_H
 
@@ -22,7 +22,7 @@ struct IView
 
 };
 
-IView* createView( 
+IView* createView(
 	HINSTANCE hInstance,
 	be::IDocument* beDocument,
 	be::IController* beController );

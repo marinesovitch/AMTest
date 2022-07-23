@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #include "ph.h"
 #include "beViewportArea.h"
 #include "beConsts.h"
@@ -6,7 +6,7 @@
 namespace be
 {
 
-SViewportBorder::SViewportBorder( 
+SViewportBorder::SViewportBorder(
 	const SPoint& border,
 	const bool isMin )
 	: d_border( border )

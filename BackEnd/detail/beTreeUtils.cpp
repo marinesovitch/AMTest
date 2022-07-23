@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #include "ph.h"
 #include "beTreeUtils.h"
 
@@ -8,8 +8,8 @@ namespace be
 namespace utils
 {
 
-bool cmp_less_by_x( 
-	const SPoint& lhs, 
+bool cmp_less_by_x(
+	const SPoint& lhs,
 	const SPoint& rhs,
 	const bool resultIfEqual )
 {
@@ -17,11 +17,11 @@ bool cmp_less_by_x(
 
 	const int lx = lhs.x;
 	const int rx = rhs.x;
-	if ( lx < rx ) 
+	if ( lx < rx )
 	{
 		result = true;
 	}
-	else if ( lx == rx ) 
+	else if ( lx == rx )
 	{
 		const int ly = lhs.y;
 		const int ry = rhs.y;
@@ -38,8 +38,8 @@ bool cmp_less_by_x(
 	return result;
 }
 
-bool cmp_less_by_y( 
-	const SPoint& lhs, 
+bool cmp_less_by_y(
+	const SPoint& lhs,
 	const SPoint& rhs,
 	const bool resultIfEqual )
 {
@@ -47,11 +47,11 @@ bool cmp_less_by_y(
 
 	const int ly = lhs.y;
 	const int ry = rhs.y;
-	if ( ly < ry ) 
+	if ( ly < ry )
 	{
 		result = true;
 	}
-	else if ( ly == ry ) 
+	else if ( ly == ry )
 	{
 		const int lx = lhs.x;
 		const int rx = rhs.x;

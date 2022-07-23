@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #ifndef INC_BE_INTERNAL_DOCUMENT_H
 #define INC_BE_INTERNAL_DOCUMENT_H
 
@@ -22,7 +22,7 @@ struct IInternalDocument : public IDocument
 			const SRect& viewportRect,
 			section_ids_t* sections ) const = 0;
 
-		virtual void getSection( 
+		virtual void getSection(
 			const section_id_t sectid,
 			SSection* section ) const = 0;
 

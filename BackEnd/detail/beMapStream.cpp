@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #include "ph.h"
 #include "beMapStream.h"
 #include "beConsts.h"
@@ -200,7 +200,7 @@ const int s_rawDataStream[] =
 	//// points { x, y, x, y, ... }
 	//500, 500,
 	//700, 500,
-	//700, 700, 
+	//700, 700,
 
 	StreamTerminator
 };

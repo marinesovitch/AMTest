@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #include "ph.h"
 #include "beDiagnostics.h"
 #include "beInternalDocument.h"
@@ -21,11 +21,11 @@ struct compare_by_x
 
 		const int lx = lhs.x;
 		const int rx = rhs.x;
-		if ( lx < rx ) 
+		if ( lx < rx )
 		{
 			result = true;
 		}
-		else if ( lx == rx ) 
+		else if ( lx == rx )
 		{
 			const int ly = lhs.y;
 			const int ry = rhs.y;
@@ -47,11 +47,11 @@ struct compare_by_y
 
 		const int ly = lhs.y;
 		const int ry = rhs.y;
-		if ( ly < ry ) 
+		if ( ly < ry )
 		{
 			result = true;
 		}
-		else if ( ly == ry ) 
+		else if ( ly == ry )
 		{
 			const int lx = lhs.x;
 			const int rx = rhs.x;
@@ -112,8 +112,8 @@ void dumpPoints( const raw_segments_t& segments )
 	for ( const SRawSegment& segment : segments )
 	{
 		const points_t& segmentPoints = segment.d_points;
-		points.insert( 
-			points.end(), 
+		points.insert(
+			points.end(),
 			segmentPoints.begin(),
 			segmentPoints.end() );
 	}
@@ -132,10 +132,10 @@ void dumpPoints( const raw_segments_t& segments )
 void dumpRect( const SRect& rect )
 {
 	const SSize& size = rect.getSize();
-	std::cout << "(" << rect.left << ", " << rect.top 
-		<< ", " << rect.right << ", " << rect.bottom << ")" 
-		<< std::hex << " (" << rect.left << ", " << rect.top 
-		<< ", " << rect.right << ", " << rect.bottom << ")" 
+	std::cout << "(" << rect.left << ", " << rect.top
+		<< ", " << rect.right << ", " << rect.bottom << ")"
+		<< std::hex << " (" << rect.left << ", " << rect.top
+		<< ", " << rect.right << ", " << rect.bottom << ")"
 		<< std::dec << "  dims: " << size.width << ',' << size.height << std::endl;
 }
 
@@ -145,17 +145,17 @@ void dumpView( const SViewData& viewData )
 {
 	static unsigned int s_counter = 0;
 	std::cout << "------------------- ViewData: " << s_counter++ << std::endl
-		<< "viewport center: " << viewData.d_viewportCenter.x << ' ' 
+		<< "viewport center: " << viewData.d_viewportCenter.x << ' '
 		<< viewData.d_viewportCenter.y << std::endl
-		<< "device size: " << viewData.d_deviceSize.width << ' ' 
+		<< "device size: " << viewData.d_deviceSize.width << ' '
 		<< viewData.d_deviceSize.height << std::endl
-		<< "screen size: " << viewData.d_screenSize.width << ' ' 
+		<< "screen size: " << viewData.d_screenSize.width << ' '
 		<< viewData.d_screenSize.height << std::endl
 		<< "zoom factor: " << viewData.d_zoomFactor << std::endl
 		;
 }
 
-void dumpSections( 
+void dumpSections(
 	const IInternalDocument* document,
 	const section_ids_t& sections )
 {

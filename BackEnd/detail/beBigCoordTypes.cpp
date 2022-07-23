@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #include "ph.h"
 #include "beBigCoordTypes.h"
 #include "beConsts.h"
@@ -84,7 +84,7 @@ SBigRect::SBigRect(
 	big_coord_t r,
 	big_coord_t b ) noexcept
 	: left( l )
-	, top( t ) 
+	, top( t )
 	, right( r )
 	, bottom( b )
 {
@@ -93,7 +93,7 @@ SBigRect::SBigRect(
 SBigRect::SBigRect(
 	const SRect& rect )
 	: left( rect.left )
-	, top( rect.top ) 
+	, top( rect.top )
 	, right( rect.right )
 	, bottom( rect.bottom )
 {
@@ -103,7 +103,7 @@ SBigRect::SBigRect(
 	const SBigPoint& topLeft,
 	const SBigSize& size )
 	: left( topLeft.x )
-	, top( topLeft.y ) 
+	, top( topLeft.y )
 	, right( topLeft.x + size.width )
 	, bottom( topLeft.y + size.height )
 {
@@ -111,9 +111,9 @@ SBigRect::SBigRect(
 
 SRect SBigRect::getRect() const
 {
-	const SRect result( 
+	const SRect result(
 		utils::big2coord( left ),
-		utils::big2coord( top ), 
+		utils::big2coord( top ),
 		utils::big2coord( right ),
 		utils::big2coord( bottom ) );
 	return result;

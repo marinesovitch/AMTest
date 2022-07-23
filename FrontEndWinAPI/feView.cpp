@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #include "stdafx.h"
 #include "feView.h"
 #include "BackEnd/h/beDocument.h"
@@ -23,7 +23,7 @@ class auto_gdi_object
 {
     public:
         auto_gdi_object( HDC hdc, THandle gdiObject )
-            : d_hdc( hdc ) 
+            : d_hdc( hdc )
         {
             d_prevGdiObject = ::SelectObject( d_hdc, gdiObject );
         }
@@ -221,9 +221,9 @@ void KPainter::fillBackground( const RECT& rc, HDC hdc )
 void KPainter::drawParamsDescription( const std::string& description )
 {
 	const int DescriptionScreenOffset = 10;
-	::TextOut( 
-		d_hdc, 
-		DescriptionScreenOffset, 
+	::TextOut(
+		d_hdc,
+		DescriptionScreenOffset,
 		DescriptionScreenOffset,
 		description.c_str(),
 		static_cast<int>(description.length()) );
@@ -235,7 +235,7 @@ void KPainter::drawParamsDescription( const std::string& description )
 class KView : public IView
 {
 	public:
-		KView( 
+		KView(
 			HINSTANCE hInstance,
 			be::IDocument* beDocument,
 			be::IController* beController );
@@ -284,7 +284,7 @@ class KView : public IView
 
 // ----------------------------------------------------------------------------
 
-KView::KView( 
+KView::KView(
 	HINSTANCE hInstance,
 	be::IDocument* beDocument,
 	be::IController* beController )
@@ -321,16 +321,16 @@ int KView::run()
 bool KView::init( const int cmdShow )
 {
 	d_hwnd = ::CreateWindow(
-		WindowClassName, 
-		"AMtest", 
+		WindowClassName,
+		"AMtest",
 		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 
-		0, 
-		CW_USEDEFAULT, 
-		0, 
-		0, 
-		0, 
-		d_hInstance, 
+		CW_USEDEFAULT,
+		0,
+		CW_USEDEFAULT,
+		0,
+		0,
+		0,
+		d_hInstance,
 		this );
 
 	if ( d_hwnd)
@@ -397,7 +397,7 @@ LRESULT CALLBACK KView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 			break;
 
 		case WM_ERASEBKGND:
-			result = true;			
+			result = true;
 			break;
 
 		case WM_LBUTTONDOWN:
@@ -434,8 +434,8 @@ LRESULT CALLBACK KView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
 void KView::onSize( WPARAM /*wParam*/, LPARAM lParam )
 {
-	const be::coord_t width = LOWORD( lParam ); 
-	const be::coord_t height = HIWORD( lParam ); 
+	const be::coord_t width = LOWORD( lParam );
+	const be::coord_t height = HIWORD( lParam );
 	const be::SSize deviceSize( width, height );
 	d_beController->setDeviceSize( deviceSize );
 	refresh();
@@ -467,8 +467,8 @@ void KView::onPaint()
 
 void KView::onLButtonDown( WPARAM wParam, LPARAM lParam )
 {
-	const be::coord_t x = LOWORD( lParam ); 
-	const be::coord_t y = HIWORD( lParam ); 
+	const be::coord_t x = LOWORD( lParam );
+	const be::coord_t y = HIWORD( lParam );
 	const be::SPoint focusScreenPoint( x, y );
 	if ( ( wParam & MK_CONTROL ) == MK_CONTROL )
 	{
@@ -483,7 +483,7 @@ void KView::onLButtonDown( WPARAM wParam, LPARAM lParam )
 void KView::onRButtonDown( WPARAM wParam, LPARAM lParam )
 {
 	const int x = LOWORD( lParam );
-	const int y = HIWORD( lParam ); 
+	const int y = HIWORD( lParam );
 	if ( ( wParam & MK_CONTROL ) == MK_CONTROL )
 	{
 		const be::SPoint focusScreenPoint( x, y );
@@ -608,7 +608,7 @@ IView::~IView()
 {
 }
 
-IView* createView( 
+IView* createView(
 	HINSTANCE hInstance,
 	be::IDocument* beDocument,
 	be::IController* beController )

@@ -1,4 +1,4 @@
-// author: marines marinesovitch alias Darek Slusarczyk 2012-2013
+// author: marines marinesovitch alias Darek Slusarczyk 2012-2013, 2022
 #include "stdafx.h"
 #include "resource.h"
 #include "feView.h"
@@ -28,7 +28,7 @@ void initBackendInstance( be::SInstance* beInstance )
 {
 	std::unique_ptr< be::IMapStream > mapStream( createMapStream() );
 	if ( !beInstance->init( mapStream.get() ) )
-		throw std::runtime_error( "Cannot initialize backend instance. Check if map file '" 
+		throw std::runtime_error( "Cannot initialize backend instance. Check if map file '"
 			+ MapFilePath + "' is available. " );
 }
 
@@ -48,7 +48,7 @@ int APIENTRY _tWinMain(
 	{
 		be::SInstance beInstance;
 		initBackendInstance( &beInstance );
-		std::unique_ptr< fe::IView > view( 
+		std::unique_ptr< fe::IView > view(
 			fe::createView( hInstance, beInstance.d_document, beInstance.d_controller ) );
 		if ( view->init( nCmdShow ) )
 			result = view->run();
@@ -62,6 +62,6 @@ int APIENTRY _tWinMain(
 	{
 		::MessageBox( 0, "Unknown internal error!", "Error", MB_OK );
 	}
-	
+
 	return result;
 }
