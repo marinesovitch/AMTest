@@ -21,21 +21,21 @@ const char* WindowClassName = "FrontEndWinAPIWindowClassName";
 template< typename THandle >
 class auto_gdi_object
 {
-    public:
-        auto_gdi_object( HDC hdc, THandle gdiObject )
-            : d_hdc( hdc )
-        {
-            d_prevGdiObject = ::SelectObject( d_hdc, gdiObject );
-        }
+	public:
+		auto_gdi_object( HDC hdc, THandle gdiObject )
+			: d_hdc( hdc )
+		{
+			d_prevGdiObject = ::SelectObject( d_hdc, gdiObject );
+		}
 
-        ~auto_gdi_object()
-        {
-            ::SelectObject( d_hdc, d_prevGdiObject );
-        }
+		~auto_gdi_object()
+		{
+			::SelectObject( d_hdc, d_prevGdiObject );
+		}
 
-    private:
-        HDC d_hdc;
-        HGDIOBJ d_prevGdiObject;
+	private:
+		HDC d_hdc;
+		HGDIOBJ d_prevGdiObject;
 
 };
 
@@ -185,7 +185,7 @@ void KPainter::run( const KBitmap& bitmap )
 	const be::coord_t width = bitmap.getWidth();
 	const be::coord_t height = bitmap.getHeight();
 
-    HDC hdcMem = ::CreateCompatibleDC(d_hdc);
+	HDC hdcMem = ::CreateCompatibleDC(d_hdc);
 	HBITMAP hBmp = ::CreateCompatibleBitmap( d_hdc, width, height );
 	::SelectObject(hdcMem, hBmp);
 
@@ -204,8 +204,8 @@ void KPainter::run( const KBitmap& bitmap )
 		}
 	}
 
-    ::BitBlt(d_hdc, 0, 0, width, height, hdcMem, 0, 0, SRCCOPY);
-    ::DeleteDC(hdcMem);
+	::BitBlt(d_hdc, 0, 0, width, height, hdcMem, 0, 0, SRCCOPY);
+	::DeleteDC(hdcMem);
 	::DeleteObject( hBmp );
 }
 
@@ -588,9 +588,9 @@ void KView::refresh()
 
 void KView::showPopupMenu( const int x, const int y )
 {
-    HMENU popupMenu = ::CreatePopupMenu();
-    ::InsertMenu( popupMenu, 0, MF_BYPOSITION | MF_STRING, IDM_SHOW_PARAMS, "Show params" );
-    ::InsertMenu( popupMenu, 0, MF_BYPOSITION | MF_STRING, IDM_RESET_VIEW, "Reset view");
+	HMENU popupMenu = ::CreatePopupMenu();
+	::InsertMenu( popupMenu, 0, MF_BYPOSITION | MF_STRING, IDM_SHOW_PARAMS, "Show params" );
+	::InsertMenu( popupMenu, 0, MF_BYPOSITION | MF_STRING, IDM_RESET_VIEW, "Reset view");
 	::TrackPopupMenu( popupMenu, TPM_TOPALIGN | TPM_LEFTALIGN, x, y, 0, d_hwnd, 0 );
 }
 

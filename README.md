@@ -33,7 +33,6 @@ It is a binary file, and its format is as follows:
 		- int32: x
 		- int32: y
 
-
 ## How to build
 
 ### Android
