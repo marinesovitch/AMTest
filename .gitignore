@@ -1,5 +1,6 @@
-win32build
+Win32
 x64
 .vs
 .vscode
 *.vcxproj.user
+FrontEndWinAPI/mapa.dat

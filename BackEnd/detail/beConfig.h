@@ -2,10 +2,12 @@
 #ifndef INC_BE_CONFIG_H
 #define INC_BE_CONFIG_H
 
-//#ifndef NDEBUG
-#define ENABLE_LOGGING
-#define ENABLE_TREE_CHECKERS
-#define BRUTE_FORCE_SELECT_SECTIONS_CHECKER
-//#endif
+#ifndef NDEBUG
+// a few macros to drive the diagnostic code
+// CAUTION! The performance of the application built with them enabled is significantly lower
+// #define ENABLE_LOGGING
+// #define ENABLE_TREE_CHECKERS
+// #define BRUTE_FORCE_SELECT_SECTIONS_CHECKER
+#endif
 
 #endif
