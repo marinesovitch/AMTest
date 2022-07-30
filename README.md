@@ -41,26 +41,26 @@ It is a binary file, and its format is as follows:
 * select build variant (debug or release)
 * build, and run
 
-[Click here to open a sample screenshot of the application running on the emulator in the Android Studio.]()
+[Click here to open a sample screenshot of the application running on the emulator in the Android Studio.](https://raw.githubusercontent.com/marinesovitch/media/trunk/AMTest/android_studio_emulator.png)
 
 ### Windows
 
 * open [AMtestWin.sln](AMtestWin.sln) in Visual Studio (tested on VS2022 Community Edition)
 * choose the desired configuration (Debug or Release) and platform (Win32 or x64)
-* build, depending on the chosen setup, the application will be stored in \[Win32|x64\]/\[Debug|Release\]/FrontEndWinAPI.exe
+* build, depending on the chosen setup, the application will be stored in `[Win32|x64]/[Debug|Release]/FrontEndWinAPI.exe`
 * copy [mapa.dat](FrontEndAndroid/app/src/main/assets/mapa.dat) to:
-	- [FrontEndWinAPI](FrontEndWinAPI) in case the application is executed from VS
-	- or to the directory where the FrontEndWinAPI.exe binary is located, e.g. in case it is started directly
+	- [FrontEndWinAPI](FrontEndWinAPI) project directory in case the application is executed from VS
+	- or to the directory where the `FrontEndWinAPI.exe` binary is located, e.g. in case it is started directly
 * run
 
-[Click here to open a sample screenshot of the application running under Windows.]()
+[Click here to open a sample screenshot of the application running under Windows.](https://raw.githubusercontent.com/marinesovitch/media/trunk/AMTest/winapi.png)
 
 ## How to use
 
 ### User actions
 
 | Action                     | Android gesture                                  | Windows mouse / keyboard                 |
-| :---:                      | :---:                                            | :---:                                    |
+|           :---:            |                   :---:                          |                 :---:                    |
 | center map to a given point | single-tap with one finger                      | left-mouse-button-click                  |
 | zoom in                    | double-tap with one finger                       | CTRL-button + left-mouse-button-click    |
 | zoom out                   | single-tap with two fingers                      | CTRL-button + right-mouse-button-click   |
