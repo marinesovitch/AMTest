@@ -41,7 +41,7 @@ It is a binary file, and its format is as follows:
 * select build variant (debug or release)
 * build, and run
 
-[Click here to open a sample screenshot of the application running on the emulator in the Android Studio.](https://raw.githubusercontent.com/marinesovitch/media/trunk/AMTest/android_studio_emulator.png)
+![Alt text](https://raw.githubusercontent.com/marinesovitch/media/trunk/AMTest/android_studio_emulator.png "a sample screenshot of the application running on the emulator in the Android Studio")
 
 ### Windows
 
@@ -53,7 +53,7 @@ It is a binary file, and its format is as follows:
 	- or to the directory where the `FrontEndWinAPI.exe` binary is located, e.g. in case it is started directly
 * run
 
-[Click here to open a sample screenshot of the application running under Windows.](https://raw.githubusercontent.com/marinesovitch/media/trunk/AMTest/winapi.png)
+![Alt text](https://raw.githubusercontent.com/marinesovitch/media/trunk/AMTest/winapi.png "a sample screenshot of the application running under Windows")
 
 ## How to use
 
